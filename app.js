@@ -1,14 +1,13 @@
-let numberOfRows = 2,
+let numberOfRows = 4,
     numberOfColumns = numberOfRows;
 let cellDimension = (1/numberOfRows)*100;
 let r = 83,
     g = 109,
     b = 89;
 var cellColorOnAlive =  "rgb(" + r + ", " + g + ", " + b + ")"; 
+let exportSize = 400;
 var colorPicker = document.getElementById('colorPicker');
 var container = document.getElementById('container')
-let averageButton = document.getElementById('averageButton');
-averageButton.addEventListener('click', averageColors);
 
 function update(jscolor) {
     cellColorOnAlive = '#' + jscolor;
@@ -39,38 +38,7 @@ for(let i=0; i<numberOfRows;i++) {
 	column = [];
 }
 
-function averageColors() {
-let patternVectors = [];
-patternVectors.push([-1, -1]);
-patternVectors.push([0, -1]);
-patternVectors.push([1, -1]);
-patternVectors.push([-1, 0]);
-// patternVectors.push([0, 0]);
-patternVectors.push([1, 0]);
-patternVectors.push([-1, 1]);
-patternVectors.push([0, 1]);
-patternVectors.push([1, 1]);
-
-	
-	let count = 0;
-	let colorArray = [];
-	patternVectors.forEach(function(vector) {
-		colorArray.push(row[1+vector[1]][1+vector[0]].style.backgroundColor);
-	});
-	// console.log(chroma.average(colorArray).hex());
-	row[1][1].style.backgroundColor = chroma.average(colorArray).hex();
-}
-
 document.body.appendChild(container);
-
-
-
-
-
-
-
-
-
 
 
 document.getElementById('randomButton').addEventListener('click', function(){
@@ -127,10 +95,20 @@ function randomizeGrid(matrix, percentEmpty) {
 
 
 document.getElementById('exportButton').addEventListener('click', function() {
-	 // var win = window.open('data:text/plain;charset=utf-8,Hello%20World', '_blank');
-	 var win = window.open(PNGFromGrid(row), '_blank');
-  	 win.focus();
-})
+     document.getElementById('overlay').classList.remove('hidden');
+   	    var myFrame = document.getElementById("myFrame");
+   	    let cellSize = Math.floor(exportSize/numberOfColumns);
+    	myFrame.height = exportSize;
+    	myFrame.width = exportSize;    
+    	myFrame.frameBorder= "0";
+    	myFrame.src = PNGFromGrid(row, cellSize);
+    	myFrame.classList.remove('hidden');
+});
+
+document.getElementById('overlayExitIcon').addEventListener('click', function() {
+	document.getElementById('overlay').classList.add('hidden');
+	document.getElementById('myFrame').classList.add('hidden');
+});
 
 
 
@@ -149,10 +127,9 @@ var colorArray3 = [
 ]
 
 
-function PNGFromGrid(colorArray) {
+function PNGFromGrid(colorArray, cellSize) {
   let numberOfRows = colorArray.length;
   let numberOfColumns = colorArray[0].length;
-  let cellSize = 200;
 
   var c = document.getElementById("myCanvas");
   c.height = numberOfRows*cellSize;
@@ -167,10 +144,9 @@ function PNGFromGrid(colorArray) {
     }
   }
 
-  c.style.visibility = "hidden";
 
   // Finally, we get the image data using the .toDataURL() canvas method:
-  console.log(c.toDataURL("image/png")); 
+  // console.log(c.toDataURL("image/png")); 
   return c.toDataURL("image/png");
 }
 

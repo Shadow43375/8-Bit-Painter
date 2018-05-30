@@ -7,16 +7,29 @@
     <script type="text/javascript" src="bower_components/chroma-js/chroma.js"></script>
 </head>
 <body>
+
+     <div class="hidden" id='overlay'>
+        <i id="overlayExitIcon">X</i>
+      </div>
+
 	<div id='container'>
 
 	</div>
-	<button id='averageButton'>Average</button>
 	<button id='randomButton'>Randomize</button>
 	<button id='exportButton'>Export</button>
 
     <input class="jscolor {onFineChange:'update(this)'}" id='colorPicker'></button>
     <canvas id="myCanvas" style="display: none">
     Your browser does not support the HTML5 canvas tag.</canvas> 
+
+
+
+   <iframe class='hidden' id="myFrame" width="500" height="500">
+      
+    </iframe>
+
+
+
 
 
 	<script type="text/javascript" src='app.js'></script>

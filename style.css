@@ -13,6 +13,7 @@
 	width: 500px;
 	display: flex;
 	flex-wrap: wrap;
+	z-index: 0;
 }
 
 .cell {
@@ -21,4 +22,33 @@
 	background-color: white;
 	border: 1px solid black;
 	cursor: pointer;
+}
+
+.hidden {
+	display: none;
+}
+
+#overlay {    
+  background-color: rgba(14, 15, 17, 0.96);
+  position: absolute;
+  top: 0px;
+  height: 120%;
+  width: 100%;
+  z-index: 1;
+}
+
+#overlayExitIcon {
+	position: absolute;
+	left: 95%;
+	cursor: pointer;
+	font-size: 2em;
+	color: white;
+}
+
+#myFrame {
+ 	position: absolute;
+ 	top: 50%;
+ 	left: 50%;
+ 	transform: translate(-50%, -50%);
+	z-index: 5;
 }
