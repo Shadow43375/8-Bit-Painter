@@ -1,3 +1,5 @@
+var pressed = {};
+
 let numberOfRows = 4,
     numberOfColumns = numberOfRows;
 let cellDimension = (1/numberOfRows)*100;
@@ -14,13 +16,58 @@ function update(jscolor) {
 }
 
 function toggleColor() {
-	if(this.style.backgroundColor  === "white") {
-	  this.style.backgroundColor  = cellColorOnAlive;
+	if(mode==="paint") {
+		if(this.style.backgroundColor  === "white") {
+		  this.style.backgroundColor  = cellColorOnAlive;
+		}
+		else if(this.style.backgroundColor === cellColorOnAlive) {
+			return;
+		}
+		else if(this.style.backgroundColor  !== "white") {
+			this.style.backgroundColor = "white";
+		}		
 	}
-	else if(this.style.backgroundColor  !== "white") {
+	else if(mode==="erase") {
 		this.style.backgroundColor = "white";
+		mode="erase";
 	}
 }
+
+
+
+
+var mode = 'paint';
+
+function brush() {	
+	console.log("mode is " + mode);
+   if(mode === "paint") {
+		if(pressed["mousedown"] === true) {
+			this.style.backgroundColor = cellColorOnAlive;
+		}   	
+   }
+
+   	else if(mode === "erase") {
+		if(pressed["mousedown"] === true) {
+			this.style.backgroundColor = "white";
+		}   		
+   	}
+}
+
+brush.prototype.changeMode = function() {
+	console.log("be the change in the world that you want to see");
+	console.log(mode)
+	if(mode === "paint") {
+		mode = "erase";
+	}
+	else if(mode === "erase") {
+		mode = "paint";
+	}
+    else {
+    	console.log("ERROR: " + mode + "is not a valid brush mode");
+    }
+ 	console.log(mode);
+}
+
 
 var row = [];
 var column = [];
@@ -31,7 +78,11 @@ for(let i=0; i<numberOfRows;i++) {
 		column[j].style.backgroundColor = "white";
 		column[j].style.height = String(cellDimension) + "%";
 		column[j].style.width = String(cellDimension) + "%";	
-		column[j].onclick = toggleColor.bind(column[j]);
+		column[j].onmousedown = toggleColor.bind(column[j]);
+		// column[j].onmouseover = paint.bind(column[j]);
+		// var brush = new Brush();
+		console.log(typeof brush);
+		column[j].onmouseover = brush.bind(column[j]);
 		container.appendChild(column[j]);
 	}
 	row.push(column);
@@ -105,6 +156,19 @@ document.getElementById('exportButton').addEventListener('click', function() {
     	myFrame.classList.remove('hidden');
 });
 
+
+document.getElementById('changeModeButton').addEventListener('click', function() {
+	// if(brush.mode === "paint") {
+	// 	brush.mode = "erase";
+	// }
+	// else if(brush.mode === "erase") {
+	// 	brush.mode = "paint";
+	// }
+	brush.prototype.changeMode('paint');
+});
+
+
+
 document.getElementById('overlayExitIcon').addEventListener('click', function() {
 	document.getElementById('overlay').classList.add('hidden');
 	document.getElementById('myFrame').classList.add('hidden');
@@ -144,11 +208,23 @@ function PNGFromGrid(colorArray, cellSize) {
     }
   }
 
-
-  // Finally, we get the image data using the .toDataURL() canvas method:
-  // console.log(c.toDataURL("image/png")); 
   return c.toDataURL("image/png");
 }
 
-// row[1][0].style.backgroundColor = "red";
 
+
+console.log(pressed["mousedown"] === true);
+
+
+window.onmousedown = function(event){
+	 event.preventDefault();
+     pressed["mousedown"] = true;
+     console.log(pressed);
+}
+
+window.onmouseup = function(event){
+     event.preventDefault();	
+     pressed["mousedown"] = false;
+     delete pressed["mousedown"]
+     console.log("mouse event deleted");
+}
