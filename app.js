@@ -15,17 +15,15 @@ function update(jscolor) {
     cellColorOnAlive = '#' + jscolor;
 }
 
-function toggleColor() {
+function clickCell() {
 	if(mode==="paint") {
-		if(this.style.backgroundColor  === "white") {
-		  this.style.backgroundColor  = cellColorOnAlive;
-		}
-		else if(this.style.backgroundColor === cellColorOnAlive) {
-			return;
-		}
-		else if(this.style.backgroundColor  !== "white") {
-			this.style.backgroundColor = "white";
-		}		
+		// if(this.style.backgroundColor  === "white" || this.style.backgroundColor ) {
+		//   this.style.backgroundColor  = cellColorOnAlive;
+		// }
+		// else if(this.style.backgroundColor  !== "white") {
+		// 	this.style.backgroundColor = "white";
+		// }	
+		this.style.backgroundColor  = cellColorOnAlive;	
 	}
 	else if(mode==="erase") {
 		this.style.backgroundColor = "white";
@@ -78,7 +76,7 @@ for(let i=0; i<numberOfRows;i++) {
 		column[j].style.backgroundColor = "white";
 		column[j].style.height = String(cellDimension) + "%";
 		column[j].style.width = String(cellDimension) + "%";	
-		column[j].onmousedown = toggleColor.bind(column[j]);
+		column[j].onmousedown = clickCell.bind(column[j]);
 		// column[j].onmouseover = paint.bind(column[j]);
 		// var brush = new Brush();
 		console.log(typeof brush);
