@@ -1,6 +1,6 @@
 var pressed = {};
-
-let numberOfRows = 4,
+var gridColor = "1px solid black";
+let numberOfRows = 15,
     numberOfColumns = numberOfRows;
 let cellDimension = (1/numberOfRows)*100;
 let r = 83,
@@ -17,12 +17,6 @@ function update(jscolor) {
 
 function clickCell() {
 	if(mode==="paint") {
-		// if(this.style.backgroundColor  === "white" || this.style.backgroundColor ) {
-		//   this.style.backgroundColor  = cellColorOnAlive;
-		// }
-		// else if(this.style.backgroundColor  !== "white") {
-		// 	this.style.backgroundColor = "white";
-		// }	
 		this.style.backgroundColor  = cellColorOnAlive;	
 	}
 	else if(mode==="erase") {
@@ -32,23 +26,43 @@ function clickCell() {
 }
 
 
+function changeCursor(resourcePath) {
+		for(let i = 0; i< numberOfRows; i++) {
+			for(let j = 0; j < numberOfColumns; j++) {
+				row[i][j].style.cursor = resourcePath;
+			}
+		}
+}
 
 
 var mode = 'paint';
 
 function brush() {	
-	console.log("mode is " + mode);
-   if(mode === "paint") {
-		if(pressed["mousedown"] === true) {
-			this.style.backgroundColor = cellColorOnAlive;
-		}   	
+   if(pressed["mousedown"] === true) {
+	   if(mode === "paint") {
+			if(pressed["mousedown"] === true) {
+				this.style.backgroundColor = cellColorOnAlive;
+			}   	
+	   }
+
+	   	else if(mode === "erase") {
+			if(pressed["mousedown"] === true) {
+				this.style.backgroundColor = "white";
+			}   		
+	   	}   	
    }
 
-   	else if(mode === "erase") {
-		if(pressed["mousedown"] === true) {
-			this.style.backgroundColor = "white";
-		}   		
-   	}
+   else if(pressed["mousedown"] !== true && this.style.backgroundColor === "white") {
+      this.style.backgroundColor = "rgba(205, 253, 253, 0.7)";
+   }
+
+}
+
+
+function hoverOffEffect() {
+	if(pressed["mousedown"] !== true && this.style.backgroundColor === "rgba(205, 253, 253, 0.7)") {   
+      this.style.backgroundColor = "white";
+   }	
 }
 
 brush.prototype.changeMode = function() {
@@ -56,9 +70,11 @@ brush.prototype.changeMode = function() {
 	console.log(mode)
 	if(mode === "paint") {
 		mode = "erase";
+		changeCursor("url('resources/eraser.png'), auto");
 	}
 	else if(mode === "erase") {
 		mode = "paint";
+		changeCursor("url('resources/pencil-cursor.png'), auto");
 	}
     else {
     	console.log("ERROR: " + mode + "is not a valid brush mode");
@@ -75,10 +91,11 @@ for(let i=0; i<numberOfRows;i++) {
 		column[j].classList.add('cell');
 		column[j].style.backgroundColor = "white";
 		column[j].style.height = String(cellDimension) + "%";
-		column[j].style.width = String(cellDimension) + "%";	
+		column[j].style.width = String(cellDimension) + "%";
+		column[j].style.border = gridColor;
+		column[j].style.cursor = "url('resources/pencil-cursor.png'), auto";	
 		column[j].onmousedown = clickCell.bind(column[j]);
-		// column[j].onmouseover = paint.bind(column[j]);
-		// var brush = new Brush();
+		column[j].onmouseout = hoverOffEffect.bind(column[j]);
 		console.log(typeof brush);
 		column[j].onmouseover = brush.bind(column[j]);
 		container.appendChild(column[j]);
@@ -155,14 +172,26 @@ document.getElementById('exportButton').addEventListener('click', function() {
 });
 
 
-document.getElementById('changeModeButton').addEventListener('click', function() {
-	// if(brush.mode === "paint") {
-	// 	brush.mode = "erase";
-	// }
-	// else if(brush.mode === "erase") {
-	// 	brush.mode = "paint";
-	// }
+document.getElementById('paintButton').addEventListener('click', function() {
 	brush.prototype.changeMode('paint');
+});
+
+document.getElementById('eraseButton').addEventListener('click', function() {
+	brush.prototype.changeMode('erase');
+});
+
+
+document.getElementById('gridToggleButton').addEventListener('click', function() {
+   		for(let i = 0; i< numberOfRows; i++) {
+			for(let j = 0; j < numberOfColumns; j++) {
+				if(row[i][j].style.border === gridColor) {
+					row[i][j].style.border = "none";
+				}
+				else if(row[i][j].style.border !== gridColor) {
+					row[i][j].style.border = gridColor;
+				}
+			}
+		}
 });
 
 

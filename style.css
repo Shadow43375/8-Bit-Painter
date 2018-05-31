@@ -11,6 +11,7 @@
  	transform: translate(-50%, -50%);
 	height: 500px;
 	width: 500px;
+	border: 1px solid black;
 	display: flex;
 	flex-wrap: wrap;
 	z-index: 0;
@@ -20,7 +21,7 @@
 /*	width: 33%;
 	height: 33%;*/
 	background-color: white;
-	border: 1px solid black;
+/*	border: 1px solid black;*/
 	cursor: pointer;
 }
 
@@ -51,4 +52,61 @@
  	left: 50%;
  	transform: translate(-50%, -50%);
 	z-index: 5;
+}
+
+button{
+	cursor: pointer;
+}
+
+
+.brushControlButton {
+  background-image: -webkit-linear-gradient(top, #0dff2d, #69fa7c);
+  background-image: -moz-linear-gradient(top, #0dff2d, #69fa7c);
+  background-image: -ms-linear-gradient(top, #0dff2d, #69fa7c);
+  background-image: -o-linear-gradient(top, #0dff2d, #69fa7c);
+  background-image: linear-gradient(to bottom, #0dff2d, #69fa7c);
+  -webkit-border-radius: 7;
+  -moz-border-radius: 7;
+  border-radius: 7px;
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 20px;
+  padding: 10px 15px 10px 15px;
+  text-decoration: none;
+}
+
+.brushControlButton:hover {
+  text-decoration: none;
+}
+
+
+
+
+#paintButton {
+  background: #0dff2d;
+}
+
+#paintButton:hover {
+  background: #6cfaae;
+}
+
+
+
+
+#eraseButton {
+  background: #ff1919;
+}
+
+#eraseButton:hover {
+  background: #fa5555;
+}
+
+
+
+#gridToggleButton {
+  background: #2f50a3;
+}
+
+#gridToggleButton:hover {
+  background: #738abf;	
 }
