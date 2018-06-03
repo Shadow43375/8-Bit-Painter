@@ -1,6 +1,6 @@
 var pressed = {};
-var gridColor = "1px solid black";
-let numberOfRows = 15,
+var gridColor = "0.1vw solid black";
+let numberOfRows = 32,
     numberOfColumns = numberOfRows;
 let cellDimension = (1/numberOfRows)*100;
 let r = 83,
@@ -195,27 +195,20 @@ document.getElementById('gridToggleButton').addEventListener('click', function()
 });
 
 
+document.getElementById('clearButton').addEventListener('click', function() {
+   		for(let i = 0; i< numberOfRows; i++) {
+			for(let j = 0; j < numberOfColumns; j++) {
+				row[i][j].style.backgroundColor = "white";
+			}
+		}	
+});
+
 
 document.getElementById('overlayExitIcon').addEventListener('click', function() {
 	document.getElementById('overlay').classList.add('hidden');
 	document.getElementById('myFrame').classList.add('hidden');
 });
 
-
-
-// var colorArray = [
-//   ["#fffa6b", "#04ff00"],
-//   ["#fe80e3", "#00feff"]
-// ];
-var colorArray2 = [
-  ["red", "green"],
-  ["yellow", "blue"]
-];
-
-var colorArray3 = [
- ["rgb(255, 0, 0)", " rgb(255, 0, 0)"],
- ["rgb(255, 0, 0)", "rgb(255, 0, 0)"]
-]
 
 
 function PNGFromGrid(colorArray, cellSize) {
@@ -246,12 +239,16 @@ console.log(pressed["mousedown"] === true);
 window.onmousedown = function(event){
 	 event.preventDefault();
      pressed["mousedown"] = true;
-     console.log(pressed);
+	 event.stopPropagation();
+     return false;
+     // console.log(pressed);
 }
 
 window.onmouseup = function(event){
      event.preventDefault();	
      pressed["mousedown"] = false;
      delete pressed["mousedown"]
-     console.log("mouse event deleted");
+ 	 event.stopPropagation();
+     return false;
+     // console.log("mouse event deleted");
 }
