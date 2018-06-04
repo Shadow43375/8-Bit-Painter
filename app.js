@@ -1,6 +1,13 @@
+var state = {
+	stateIndex: 0,
+    endIndex: 0,
+	stateArray: []
+}
+var row = [];
+var column = [];
 var pressed = {};
 var gridColor = "0.1vw solid black";
-let numberOfRows = 32,
+let numberOfRows = 16,
     numberOfColumns = numberOfRows;
 let cellDimension = (1/numberOfRows)*100;
 let r = 83,
@@ -66,8 +73,6 @@ function hoverOffEffect() {
 }
 
 brush.prototype.changeMode = function() {
-	console.log("be the change in the world that you want to see");
-	console.log(mode)
 	if(mode === "paint") {
 		mode = "erase";
 		changeCursor("url('resources/eraser.png'), auto");
@@ -79,12 +84,9 @@ brush.prototype.changeMode = function() {
     else {
     	console.log("ERROR: " + mode + "is not a valid brush mode");
     }
- 	console.log(mode);
 }
 
 
-var row = [];
-var column = [];
 for(let i=0; i<numberOfRows;i++) {
 	for(let j=0; j<numberOfColumns; j++) {
 		column.push(document.createElement('div'));
@@ -96,7 +98,6 @@ for(let i=0; i<numberOfRows;i++) {
 		column[j].style.cursor = "url('resources/pencil-cursor.png'), auto";	
 		column[j].onmousedown = clickCell.bind(column[j]);
 		column[j].onmouseout = hoverOffEffect.bind(column[j]);
-		console.log(typeof brush);
 		column[j].onmouseover = brush.bind(column[j]);
 		container.appendChild(column[j]);
 	}
@@ -105,10 +106,12 @@ for(let i=0; i<numberOfRows;i++) {
 }
 
 document.body.appendChild(container);
+state.stateArray.push(makeGridCopy(row));
 
 
 document.getElementById('randomButton').addEventListener('click', function(){
 	randomizeGrid(row, 0.50);
+    addState();
 });
 
 function randomizeGrid(matrix, percentEmpty) {
@@ -200,7 +203,30 @@ document.getElementById('clearButton').addEventListener('click', function() {
 			for(let j = 0; j < numberOfColumns; j++) {
 				row[i][j].style.backgroundColor = "white";
 			}
-		}	
+		}
+		clearSates();	
+});
+
+document.getElementById('undoButton').addEventListener('click', function() {
+   if(state.stateArray[state.stateIndex - 1]) {
+	   state.stateIndex--;
+	   for(let i = 0; i<numberOfRows; i++) {
+	     for(let j = 0; j<numberOfColumns; j++) {
+	     	row[j][i].style.backgroundColor = state.stateArray[state.stateIndex][j][i];
+	    }
+	  }
+   }  
+});
+
+document.getElementById('redoButton').addEventListener('click', function() {
+   if(state.stateArray[state.stateIndex + 1]) {
+	   state.stateIndex++;
+	   for(let i = 0; i<numberOfRows; i++) {
+	     for(let j = 0; j<numberOfColumns; j++) {
+	     	row[j][i].style.backgroundColor = state.stateArray[state.stateIndex][j][i];
+	    }
+	  }
+   }   
 });
 
 
@@ -222,7 +248,6 @@ function PNGFromGrid(colorArray, cellSize) {
   var ctx = c.getContext("2d");
   for(let i = 0; i<numberOfColumns; i++) {
     for(let j = 0; j<numberOfRows; j++) {
-      console.log(colorArray[j][i]);
       ctx.fillStyle = colorArray[j][i].style.backgroundColor;
       ctx.fillRect(cellSize*i, cellSize*j, cellSize, cellSize); 
     }
@@ -233,22 +258,77 @@ function PNGFromGrid(colorArray, cellSize) {
 
 
 
-console.log(pressed["mousedown"] === true);
+function makeGridCopy(row) {
+	let newRow = [];
+	let column = [];
+	for(let i = 0; i<numberOfRows; i++) {
+		for(let j = 0; j<numberOfColumns; j++) {
+			column.push(row[i][j].style.backgroundColor);
+		}
+		newRow.push(column);
+		column = [];
+	}
+	return newRow;
+}
 
 
-window.onmousedown = function(event){
+
+function addState() {
+     if(state.stateIndex === state.endIndex) {
+     	state.stateArray.push(makeGridCopy(row));
+     }
+     else if(state.stateIndex !== state.endIndex) {
+     	while(state.stateIndex < state.endIndex) {
+	     	state.stateArray.pop();
+	     	state.endIndex--;
+     	}
+        state.stateArray.push(makeGridCopy(row));
+     }
+     state.stateIndex++;
+     state.endIndex++;
+}
+
+function isChanged() {
+    state.stateArray.push(makeGridCopy(row)); 
+
+	for(let i = 0; i<numberOfRows; i++) {
+		for(let j = 0; j<numberOfColumns; j++) {
+			if(state.stateArray[state.stateIndex][i][j] !== state.stateArray[state.stateArray.length-1][i][j]) {
+				state.stateArray.pop();
+				return true;
+			}	
+		}
+	}
+
+    state.stateArray.pop();
+	return false;
+}
+
+
+function clearSates() {
+    while(state.endIndex !== 0) {
+	    state.stateArray.pop();
+	    state.endIndex--;
+    }
+    state.stateIndex = 0;
+}
+
+
+
+
+container.onmousedown = function(event){
 	 event.preventDefault();
      pressed["mousedown"] = true;
 	 event.stopPropagation();
-     return false;
-     // console.log(pressed);
 }
 
-window.onmouseup = function(event){
+
+container.onmouseup = function(event){
      event.preventDefault();	
      pressed["mousedown"] = false;
-     delete pressed["mousedown"]
+     delete pressed["mousedown"];
+     if(isChanged()) {
+     	addState();
+     }
  	 event.stopPropagation();
-     return false;
-     // console.log("mouse event deleted");
 }
