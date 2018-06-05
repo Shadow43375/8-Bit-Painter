@@ -32,9 +32,6 @@ function clickCell() {
 		this.style.backgroundColor = "white";
 		mode="erase";
 	}
-	// else if(mode === 'floodFill') {
-	// 	floodFill(this);
-	// }
 
 	else if(mode==="rectangleTool") {
 		console.log(this.coordinates);
@@ -484,12 +481,12 @@ container.onmouseup = function(event){
      event.preventDefault();	
      pressed["mousedown"] = false;
      delete pressed["mousedown"];
-     if(isChanged()) {
-     	addState();
-     }
      if(mode === "rectangleTool") {
      	console.log("lets see if the brush function runs after this...");
      	brush.call(lastCellOfDrag);
+     }
+     if(isChanged()) {
+     	addState();
      }
  	 event.stopPropagation();
 }
