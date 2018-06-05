@@ -1,3 +1,5 @@
+var firstCellOfDrag = undefined;
+var lastCellOfDrag = undefined;
 var state = {
 	stateIndex: 0,
     endIndex: 0,
@@ -30,6 +32,15 @@ function clickCell() {
 		this.style.backgroundColor = "white";
 		mode="erase";
 	}
+	// else if(mode === 'floodFill') {
+	// 	floodFill(this);
+	// }
+
+	else if(mode==="rectangleTool") {
+		console.log(this.coordinates);
+		firstCellOfDrag = this;
+	}
+
 }
 
 
@@ -45,24 +56,37 @@ function changeCursor(resourcePath) {
 var mode = 'paint';
 
 function brush() {	
+   // seems to be a problem with the pressed object... parent processes event NOT child UGGGHHHHHH
+   console.log("brush be going!");
    if(pressed["mousedown"] === true) {
 	   if(mode === "paint") {
-			if(pressed["mousedown"] === true) {
-				this.style.backgroundColor = cellColorOnAlive;
-			}   	
+			this.style.backgroundColor = cellColorOnAlive;	
 	   }
 
 	   	else if(mode === "erase") {
-			if(pressed["mousedown"] === true) {
-				this.style.backgroundColor = "white";
-			}   		
-	   	}   	
+			this.style.backgroundColor = "white";	
+	   	} 
+
    }
 
    else if(pressed["mousedown"] !== true && this.style.backgroundColor === "white") {
-      this.style.backgroundColor = "rgba(205, 253, 253, 0.7)";
+   		console.log("lets see now if we should draw...");
+        if(firstCellOfDrag && lastCellOfDrag) {
+        	//not running....
+        	rectanglePaint();
+        	firstCellOfDrag = undefined;
+        	lastCellOfDrag = undefined;
+        }
+        else {
+			this.style.backgroundColor = "rgba(205, 253, 253, 0.7)";
+        }
    }
 
+}
+
+function mouseUpDetector() {
+	console.log("up on " + this.coordinates);
+	lastCellOfDrag = this;
 }
 
 
@@ -72,24 +96,145 @@ function hoverOffEffect() {
    }	
 }
 
-brush.prototype.changeMode = function() {
-	if(mode === "paint") {
-		mode = "erase";
-		changeCursor("url('resources/eraser.png'), auto");
-	}
-	else if(mode === "erase") {
-		mode = "paint";
+brush.prototype.changeMode = function(newMode) {
+
+	if(newMode === "paint") {
+		mode = newMode;
 		changeCursor("url('resources/pencil-cursor.png'), auto");
 	}
+	else if(newMode === "erase") {
+		mode = newMode;
+		changeCursor("url('resources/eraser.png'), auto");
+	}
+	else if(newMode === "floodFill") {
+		mode = newMode;
+		changeCursor("url('resources/pencil-cursor.png'), auto");
+	}
+	else if(newMode === "rectangleTool") {
+		mode = newMode;
+	    changeCursor("url('resources/pencil-cursor.png'), auto");
+	}
     else {
-    	console.log("ERROR: " + mode + "is not a valid brush mode");
+    	console.log("ERROR: " + newMode + "is not a valid brush mode");
     }
 }
+
+
+function rectanglePaint() {
+	console.log("lets paint!!!");
+	console.log("first point of drag = " + "(" + firstCellOfDrag.coordinates[0] + "," + firstCellOfDrag.coordinates[1] + ")");
+	console.log("last point of drag = " + "(" + lastCellOfDrag.coordinates[0] + "," + lastCellOfDrag.coordinates[1] + ")");
+
+    function compare(number1, number2, select) {
+    	let difference = number2 - number1;
+    	if(difference<0) {
+    		if(select === "smaller") {
+    			return number2
+    		}
+    		else if(select === "greater") {
+    			return number1;
+    		}
+    	}
+    	else if(difference>0) {
+    		if(select === "smaller") {
+    			return number1;
+    		}
+    		else if(select === "greater") {
+    			return number2;
+    		}
+    	}
+    	else if(difference===0) {
+    		return number1;
+    	}
+    }
+
+    console.log("smallest = " + compare(firstCellOfDrag.coordinates[0], lastCellOfDrag.coordinates[0], "smaller"));
+     console.log("greatest = " + compare(firstCellOfDrag.coordinates[0], lastCellOfDrag.coordinates[0], "greater"));
+
+
+    for(let i = compare(firstCellOfDrag.coordinates[0], lastCellOfDrag.coordinates[0], "smaller"); i<=compare(firstCellOfDrag.coordinates[0], lastCellOfDrag.coordinates[0], "greater"); i++) {
+    	for(let j = compare(firstCellOfDrag.coordinates[1], lastCellOfDrag.coordinates[1], "smaller"); j<=compare(firstCellOfDrag.coordinates[1], lastCellOfDrag.coordinates[1], "greater"); j++) {
+    		console.log("(" + i + "," + j + ")");
+    		row[j][i].style.backgroundColor = cellColorOnAlive;
+    	}
+    }
+
+    // for(let i = firstCellOfDrag.coordinates[0]; i<=lastCellOfDrag.coordinates[0]; i++) {
+    // 	for(let j = firstCellOfDrag.coordinates[1]; j<=lastCellOfDrag.coordinates[1]; j++) {
+    // 		console.log("(" + i + "," + j + ")");
+    // 		row[j][i].style.backgroundColor = cellColorOnAlive;
+    // 	}
+    // }
+}
+
+
+//very incomplete...
+// function floodFill(cell) {
+
+// 	cell.style.backgroundColor = cellColorOnAlive
+// 	// need to find current color and factor in that it will have been changed by hovering over it... need some buffer action!!!
+// 	let directionVectors = [
+// 		[0, 1],
+// 		[1, 0],
+// 		[0, -1],
+// 		[-1, 0]
+// 	];
+
+// 	//second is X first is Y for row... 
+// 	directionVectors.forEach(function(element){
+// 		row[cell.coordinates[1] - element[0]][cell.coordinates[0] - element[1]].style.backgroundColor = cellColorOnAlive;
+// 	});
+// }
+
+//very imcomplete function...
+// function brushSize(cell) {
+
+// 	cell.style.backgroundColor = cellColorOnAlive
+// 	// need to find current color and factor in that it will have been changed by hovering over it... need some buffer action!!!
+// 	//x is first for vectors and y is second. Unfortunately the opposite of the situation below...
+
+// 	function createVectors() {
+// 		let brushSize = 3;
+// 		let baseVectors = [
+// 			[-1, -1],
+// 			[0, -1],
+// 			[1, -1],
+// 			[1, 0],
+// 			[1, 1],
+// 			[0, 1],
+// 			[-1, 1],
+// 			[-1, 0]
+// 		];
+//         let directionVectors = []
+
+// 		for(let i= 1; i<brushSize; i++) {
+// 			baseVectors.forEach(function(element){
+// 				let newVector = [];
+// 				newVector.push(i*element[0]);
+// 				newVector.push(i*element[1]);
+// 				directionVectors.push(newVector);
+// 			});
+// 		}
+
+// 		return directionVectors;
+// 	}
+
+//     let directionVectors = createVectors();
+//     console.log(directionVectors);
+// 	//second is X second is Y fisrt... 
+// 	directionVectors.forEach(function(element){
+// 		if(row[cell.coordinates[1] + element[1]] && row[cell.coordinates[1] + element[1]][cell.coordinates[0] + element[0]]) {
+// 			row[cell.coordinates[1] + element[1]][cell.coordinates[0] + element[0]].style.backgroundColor = cellColorOnAlive;
+// 		}
+// 	});
+// }
+
 
 
 for(let i=0; i<numberOfRows;i++) {
 	for(let j=0; j<numberOfColumns; j++) {
 		column.push(document.createElement('div'));
+		column[j].coordinates = [j,i]; 
 		column[j].classList.add('cell');
 		column[j].style.backgroundColor = "white";
 		column[j].style.height = String(cellDimension) + "%";
@@ -99,6 +244,8 @@ for(let i=0; i<numberOfRows;i++) {
 		column[j].onmousedown = clickCell.bind(column[j]);
 		column[j].onmouseout = hoverOffEffect.bind(column[j]);
 		column[j].onmouseover = brush.bind(column[j]);
+		//god I hate this part...but events bubble before the parent event managed can see what is going on...
+	    column[j].onmouseup = mouseUpDetector.bind(column[j]);
 		container.appendChild(column[j]);
 	}
 	row.push(column);
@@ -179,8 +326,16 @@ document.getElementById('paintButton').addEventListener('click', function() {
 	brush.prototype.changeMode('paint');
 });
 
+document.getElementById('rectangleButton').addEventListener('click', function() {
+    brush.prototype.changeMode('rectangleTool');
+});
+
 document.getElementById('eraseButton').addEventListener('click', function() {
 	brush.prototype.changeMode('erase');
+});
+
+document.getElementById('floodFillButton').addEventListener('click', function(){
+	brush.prototype.changeMode('floodFill');
 });
 
 
@@ -288,6 +443,8 @@ function addState() {
      state.endIndex++;
 }
 
+
+
 function isChanged() {
     state.stateArray.push(makeGridCopy(row)); 
 
@@ -329,6 +486,10 @@ container.onmouseup = function(event){
      delete pressed["mousedown"];
      if(isChanged()) {
      	addState();
+     }
+     if(mode === "rectangleTool") {
+     	console.log("lets see if the brush function runs after this...");
+     	brush.call(lastCellOfDrag);
      }
  	 event.stopPropagation();
 }
