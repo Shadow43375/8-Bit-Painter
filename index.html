@@ -20,6 +20,7 @@
 	<button id='randomButton'>Randomize</button>
 	<button id='exportButton'>Export</button>
 	<button class="brushControlButton" id='paintButton'><i class="fa fa-pencil-alt"></i></button>
+	<button class="brushControlButton" id='colorPickerButton'><i class="fa fa-eye-dropper"></i></button>
 	<button class="brushControlButton" id='rectangleButton'>Rectangle</button>
 	<button class="brushControlButton" id='eraseButton'><i class="fa fa-eraser"></i></button>
 	<button class="brushControlButton" id='floodFillButton'>Flood Fill</i></button>
@@ -29,7 +30,8 @@
     <button id='redoButton'>---></button>
 
 
-    <input class="jscolor {onFineChange:'update(this)'}" id='colorPicker'></button>
+    <input class="jscolor {onFineChange:'update(this)', valueElement:null,value:'536d59'}" id='colorPicker'></button>
+<!--     <input id='colorPicker'></button> -->
     <canvas id="myCanvas" style="display: none">
     Your browser does not support the HTML5 canvas tag.</canvas> 
 

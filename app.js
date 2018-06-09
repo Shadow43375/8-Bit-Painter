@@ -21,6 +21,7 @@ var colorPicker = document.getElementById('colorPicker');
 var container = document.getElementById('container')
 
 function update(jscolor) {
+	console.log("color changed");
     cellColorOnAlive = '#' + jscolor;
 }
 
@@ -36,6 +37,13 @@ function clickCell() {
 	else if(mode==="rectangleTool") {
 		console.log(this.coordinates);
 		firstCellOfDrag = this;
+	}
+
+	else if(mode === "colorPick") {
+	   	cellColorOnAlive = this.style.backgroundColor;
+        colorPicker.jscolor.fromString(cellColorOnAlive);
+	   	// console(cellColorOnAlive);
+	   	// update(colorPicker);
 	}
 
 }
@@ -54,7 +62,6 @@ var mode = 'paint';
 
 function brush() {	
    // seems to be a problem with the pressed object... parent processes event NOT child UGGGHHHHHH
-   console.log("brush be going!");
    if(pressed["mousedown"] === true) {
 	   if(mode === "paint") {
 			this.style.backgroundColor = cellColorOnAlive;	
@@ -66,15 +73,16 @@ function brush() {
 
    }
 
-   else if(pressed["mousedown"] !== true && this.style.backgroundColor === "white") {
+   // else if(pressed["mousedown"] !== true && this.style.backgroundColor === "white") {
+   else if(pressed["mousedown"] !== true) {
    		console.log("lets see now if we should draw...");
         if(firstCellOfDrag && lastCellOfDrag) {
-        	//not running....
+        	console.log("we are calling some paint here!")
         	rectanglePaint();
         	firstCellOfDrag = undefined;
         	lastCellOfDrag = undefined;
         }
-        else {
+        else if (this.style.backgroundColor === "white") {
 			this.style.backgroundColor = "rgba(205, 253, 253, 0.7)";
         }
    }
@@ -98,6 +106,14 @@ brush.prototype.changeMode = function(newMode) {
 	if(newMode === "paint") {
 		mode = newMode;
 		changeCursor("url('resources/pencil-cursor.png'), auto");
+	}
+	else if(newMode === "colorPick") {
+		mode = newMode;
+		// changeCursor("url('resources/color-dropper.png'), auto");
+		// changeCursor("url('resources/pencil-cursor.png'), auto");
+		// changeCursor("url('resources/eraser.png'), auto");
+		changeCursor("url('resources/color-dropper-medium.png'), auto");
+
 	}
 	else if(newMode === "erase") {
 		mode = newMode;
@@ -321,6 +337,11 @@ document.getElementById('exportButton').addEventListener('click', function() {
 
 document.getElementById('paintButton').addEventListener('click', function() {
 	brush.prototype.changeMode('paint');
+});
+
+document.getElementById('colorPickerButton').addEventListener('click', function() {
+	brush.prototype.changeMode('colorPick');
+	// alert("Hi");
 });
 
 document.getElementById('rectangleButton').addEventListener('click', function() {
