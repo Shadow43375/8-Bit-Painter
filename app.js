@@ -1,3 +1,4 @@
+var dragRect = [];
 var firstCellOfDrag = undefined;
 var lastCellOfDrag = undefined;
 var state = {
@@ -143,6 +144,12 @@ function rectanglePaint() {
 	console.log("first point of drag = " + "(" + firstCellOfDrag.coordinates[0] + "," + firstCellOfDrag.coordinates[1] + ")");
 	console.log("last point of drag = " + "(" + lastCellOfDrag.coordinates[0] + "," + lastCellOfDrag.coordinates[1] + ")");
 
+	if(dragRect[0]) {
+		drawRect(dragRect[0], dragRect[1], false);
+		dragRect.pop();
+		dragRect.pop();
+	}
+
     function compare(number1, number2, select) {
     	let difference = number2 - number1;
     	if(difference<0) {
@@ -170,19 +177,23 @@ function rectanglePaint() {
      console.log("greatest = " + compare(firstCellOfDrag.coordinates[0], lastCellOfDrag.coordinates[0], "greater"));
 
 
-    for(let i = compare(firstCellOfDrag.coordinates[0], lastCellOfDrag.coordinates[0], "smaller"); i<=compare(firstCellOfDrag.coordinates[0], lastCellOfDrag.coordinates[0], "greater"); i++) {
-    	for(let j = compare(firstCellOfDrag.coordinates[1], lastCellOfDrag.coordinates[1], "smaller"); j<=compare(firstCellOfDrag.coordinates[1], lastCellOfDrag.coordinates[1], "greater"); j++) {
-    		console.log("(" + i + "," + j + ")");
-    		row[j][i].style.backgroundColor = cellColorOnAlive;
-    	}
+    function drawRect(point1, point2, draw) {
+	    for(let i = compare(point1[0], point2[0], "smaller"); i<=compare(point1[0], point2[0], "greater"); i++) {
+	    	for(let j = compare(point1[1], point2[1], "smaller"); j<=compare(point1[1], point2[1], "greater"); j++) {
+	    		console.log("(" + i + "," + j + ")");
+	    		if(draw) {
+	    			row[j][i].style.backgroundColor = cellColorOnAlive;
+	    		}
+	    		else if(!draw) {
+	    			row[j][i].style.backgroundColor = 'white';
+	    		}
+	    	}
+	    }
     }
 
-    // for(let i = firstCellOfDrag.coordinates[0]; i<=lastCellOfDrag.coordinates[0]; i++) {
-    // 	for(let j = firstCellOfDrag.coordinates[1]; j<=lastCellOfDrag.coordinates[1]; j++) {
-    // 		console.log("(" + i + "," + j + ")");
-    // 		row[j][i].style.backgroundColor = cellColorOnAlive;
-    // 	}
-    // }
+    drawRect(firstCellOfDrag.coordinates, lastCellOfDrag.coordinates, true);
+	dragRect.push(firstCellOfDrag.coordinates);
+	dragRect.push(lastCellOfDrag.coordinates);
 }
 
 
@@ -496,14 +507,14 @@ function clearSates() {
 
 
 
-container.onmousedown = function(event){
+window.onmousedown = function(event){
 	 event.preventDefault();
      pressed["mousedown"] = true;
 	 event.stopPropagation();
 }
 
 
-container.onmouseup = function(event){
+window.onmouseup = function(event){
      event.preventDefault();	
      pressed["mousedown"] = false;
      delete pressed["mousedown"];
@@ -511,6 +522,7 @@ container.onmouseup = function(event){
      	console.log("lets see if the brush function runs after this...");
      	brush.call(lastCellOfDrag);
         firstCellOfDrag = undefined;
+        dragRect = [];
      }
      if(isChanged()) {
      	addState();
