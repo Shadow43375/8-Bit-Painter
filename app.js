@@ -10,7 +10,7 @@ var row = [];
 var column = [];
 var pressed = {};
 var gridColor = "0.1vw solid black";
-let numberOfRows = 16,
+let numberOfRows = 32,
     numberOfColumns = numberOfRows;
 let cellDimension = (1/numberOfRows)*100;
 let r = 83,
@@ -36,7 +36,7 @@ function downClickCell() {
 	}
 
 	else if(mode==="rectangleTool") {
-		console.log(this.coordinates);3
+		console.log(this.coordinates);
 		firstCellOfDrag = this;
 		lastCellOfDrag = this;
 	}
@@ -174,7 +174,7 @@ function rectanglePaint() {
     }
 
     console.log("smallest = " + compare(firstCellOfDrag.coordinates[0], lastCellOfDrag.coordinates[0], "smaller"));
-     console.log("greatest = " + compare(firstCellOfDrag.coordinates[0], lastCellOfDrag.coordinates[0], "greater"));
+    console.log("greatest = " + compare(firstCellOfDrag.coordinates[0], lastCellOfDrag.coordinates[0], "greater"));
 
 
     function drawRect(point1, point2, draw) {
