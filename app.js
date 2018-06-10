@@ -25,7 +25,7 @@ function update(jscolor) {
     cellColorOnAlive = '#' + jscolor;
 }
 
-function clickCell() {
+function downClickCell() {
 	if(mode==="paint") {
 		this.style.backgroundColor  = cellColorOnAlive;	
 	}
@@ -35,8 +35,9 @@ function clickCell() {
 	}
 
 	else if(mode==="rectangleTool") {
-		console.log(this.coordinates);
+		console.log(this.coordinates);3
 		firstCellOfDrag = this;
+		lastCellOfDrag = this;
 	}
 
 	else if(mode === "colorPick") {
@@ -62,6 +63,7 @@ var mode = 'paint';
 
 function brush() {	
    // seems to be a problem with the pressed object... parent processes event NOT child UGGGHHHHHH
+   lastCellOfDrag = this;
    if(pressed["mousedown"] === true) {
 	   if(mode === "paint") {
 			this.style.backgroundColor = cellColorOnAlive;	
@@ -71,27 +73,30 @@ function brush() {
 			this.style.backgroundColor = "white";	
 	   	} 
 
-   }
-
-   // else if(pressed["mousedown"] !== true && this.style.backgroundColor === "white") {
-   else if(pressed["mousedown"] !== true) {
-   		console.log("lets see now if we should draw...");
-        if(firstCellOfDrag && lastCellOfDrag) {
+	   	else if(mode === 'rectangleTool') {
         	console.log("we are calling some paint here!")
         	rectanglePaint();
-        	firstCellOfDrag = undefined;
-        	lastCellOfDrag = undefined;
-        }
-        else if (this.style.backgroundColor === "white") {
-			this.style.backgroundColor = "rgba(205, 253, 253, 0.7)";
-        }
+        	lastCellOfDrag = undefined;	   		
+	   	}
+
    }
+
+   // // else if(pressed["mousedown"] !== true && this.style.backgroundColor === "white") {
+   // else if(pressed["mousedown"] !== true) {
+   // 		// console.log("lets see now if we should draw...");
+   //   //    if(firstCellOfDrag && lastCellOfDrag) {
+
+   //      // }
+   //      if (this.style.backgroundColor === "white") {
+			// this.style.backgroundColor = "rgba(205, 253, 253, 0.7)";
+   //      }
+   // }
 
 }
 
 function mouseUpDetector() {
 	console.log("up on " + this.coordinates);
-	lastCellOfDrag = this;
+	// lastCellOfDrag = this;
 }
 
 
@@ -254,7 +259,7 @@ for(let i=0; i<numberOfRows;i++) {
 		column[j].style.width = String(cellDimension) + "%";
 		column[j].style.border = gridColor;
 		column[j].style.cursor = "url('resources/pencil-cursor.png'), auto";	
-		column[j].onmousedown = clickCell.bind(column[j]);
+		column[j].onmousedown = downClickCell.bind(column[j]);
 		column[j].onmouseout = hoverOffEffect.bind(column[j]);
 		column[j].onmouseover = brush.bind(column[j]);
 		//god I hate this part...but events bubble before the parent event managed can see what is going on...
@@ -505,6 +510,7 @@ container.onmouseup = function(event){
      if(mode === "rectangleTool") {
      	console.log("lets see if the brush function runs after this...");
      	brush.call(lastCellOfDrag);
+        firstCellOfDrag = undefined;
      }
      if(isChanged()) {
      	addState();
