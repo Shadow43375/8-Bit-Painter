@@ -1,4 +1,6 @@
 var dragRect = [];
+var coveredColumn = [];
+var coveredRow = [];
 var firstCellOfDrag = undefined;
 var lastCellOfDrag = undefined;
 var state = {
@@ -36,7 +38,6 @@ function downClickCell() {
 	}
 
 	else if(mode==="rectangleTool") {
-		console.log(this.coordinates);3
 		firstCellOfDrag = this;
 		lastCellOfDrag = this;
 	}
@@ -144,8 +145,10 @@ function rectanglePaint() {
 	console.log("first point of drag = " + "(" + firstCellOfDrag.coordinates[0] + "," + firstCellOfDrag.coordinates[1] + ")");
 	console.log("last point of drag = " + "(" + lastCellOfDrag.coordinates[0] + "," + lastCellOfDrag.coordinates[1] + ")");
 
+//need to erase as normal and then create from stored covered state
 	if(dragRect[0]) {
 		drawRect(dragRect[0], dragRect[1], false);
+		// writeRect(dragRect[0], dragRect[1]);
 		dragRect.pop();
 		dragRect.pop();
 	}
@@ -173,8 +176,28 @@ function rectanglePaint() {
     	}
     }
 
-    console.log("smallest = " + compare(firstCellOfDrag.coordinates[0], lastCellOfDrag.coordinates[0], "smaller"));
-     console.log("greatest = " + compare(firstCellOfDrag.coordinates[0], lastCellOfDrag.coordinates[0], "greater"));
+
+    function storeRect(point1, point2) {
+	    for(let i = compare(point1[0], point2[0], "smaller"); i<=compare(point1[0], point2[0], "greater"); i++) {
+	    	for(let j = compare(point1[1], point2[1], "smaller"); j<=compare(point1[1], point2[1], "greater"); j++) {
+	    		if(!coveredRow[i] || (coveredRow[i])) {
+	    			coveredColumn.push(row[j][i].style.backgroundColor);
+	    		}
+	    	}
+	    	if(!coveredRow[i]) {
+		    	coveredRow.push(coveredColumn);
+		        coveredColumn = [];
+	    	}
+	    }    	
+    }
+
+    function writeRect(point1, point2) {
+ 	    for(let i = compare(point1[0], point2[0], "smaller"); i<=compare(point1[0], point2[0], "greater"); i++) {
+	    	for(let j = compare(point1[1], point2[1], "smaller"); j<=compare(point1[1], point2[1], "greater"); j++) {
+	    			row[j][i].style.backgroundColor = coveredRow[i][j];
+	    	}
+	    }      	
+    }
 
 
     function drawRect(point1, point2, draw) {
@@ -191,9 +214,14 @@ function rectanglePaint() {
 	    }
     }
 
-    drawRect(firstCellOfDrag.coordinates, lastCellOfDrag.coordinates, true);
 	dragRect.push(firstCellOfDrag.coordinates);
 	dragRect.push(lastCellOfDrag.coordinates);
+	// storeRect(dragRect[0], dragRect[1]);
+	// writeRect(dragRect[0], dragRect[1]);
+	storeRect([0, 0], [numberOfRows - 1, numberOfRows - 1]);
+	writeRect([0, 0], [numberOfRows - 1, numberOfRows - 1]);
+    drawRect(firstCellOfDrag.coordinates, lastCellOfDrag.coordinates, "draw");
+
 }
 
 
@@ -523,6 +551,8 @@ window.onmouseup = function(event){
      	brush.call(lastCellOfDrag);
         firstCellOfDrag = undefined;
         dragRect = [];
+        coveredColumn = [];
+        coveredRow = [];
      }
      if(isChanged()) {
      	addState();
