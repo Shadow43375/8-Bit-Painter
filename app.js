@@ -38,10 +38,6 @@ function downClickCell() {
 	}
 
 	else if(mode==="rectangleTool") {
-<<<<<<< HEAD
-		console.log(this.coordinates);
-=======
->>>>>>> rectToolBugFix
 		firstCellOfDrag = this;
 		lastCellOfDrag = this;
 	}
@@ -180,10 +176,6 @@ function rectanglePaint() {
     	}
     }
 
-<<<<<<< HEAD
-    console.log("smallest = " + compare(firstCellOfDrag.coordinates[0], lastCellOfDrag.coordinates[0], "smaller"));
-    console.log("greatest = " + compare(firstCellOfDrag.coordinates[0], lastCellOfDrag.coordinates[0], "greater"));
-=======
 
     function storeRect(point1, point2) {
 	    for(let i = compare(point1[0], point2[0], "smaller"); i<=compare(point1[0], point2[0], "greater"); i++) {
@@ -206,7 +198,6 @@ function rectanglePaint() {
 	    	}
 	    }      	
     }
->>>>>>> rectToolBugFix
 
 
     function drawRect(point1, point2, draw) {
