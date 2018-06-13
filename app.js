@@ -49,6 +49,10 @@ function downClickCell() {
 	   	// update(colorPicker);
 	}
 
+	else if(mode === 'floodFill') {
+	   		floodFill(this.coordinates[0], this.coordinates[1], cellColorOnAlive, this.style.backgroundColor);
+	}
+
 }
 
 
@@ -80,6 +84,7 @@ function brush() {
         	rectanglePaint();
         	lastCellOfDrag = undefined;	   		
 	   	}
+
 
    }
 
@@ -225,66 +230,41 @@ function rectanglePaint() {
 }
 
 
-//very incomplete...
-// function floodFill(cell) {
+function floodFill(xCoordinate, yCoordinate, fillColor, regionColor) {
 
-// 	cell.style.backgroundColor = cellColorOnAlive
-// 	// need to find current color and factor in that it will have been changed by hovering over it... need some buffer action!!!
-// 	let directionVectors = [
-// 		[0, 1],
-// 		[1, 0],
-// 		[0, -1],
-// 		[-1, 0]
-// 	];
+//modify to deal with row/coordinates rather than cell...
+	if(!(row[xCoordinate] && row[yCoordinate])) {
+		return
+	}	
+	else if(row[yCoordinate][xCoordinate].style.backgroundColor === fillColor) {
+		console.log("nope: already filled!");
+		return
+	}
+	else if(row[yCoordinate][xCoordinate].style.backgroundColor !== regionColor) {
+		console.log("nope: not fill region");
+		return
+	}
+		
+	console.log("from floodFill: ");
+	console.log("(" + xCoordinate + "," + yCoordinate + ")");
+	row[yCoordinate][xCoordinate].style.backgroundColor = cellColorOnAlive;
 
-// 	//second is X first is Y for row... 
-// 	directionVectors.forEach(function(element){
-// 		row[cell.coordinates[1] - element[0]][cell.coordinates[0] - element[1]].style.backgroundColor = cellColorOnAlive;
-// 	});
-// }
+	var coordinates = [
+		// [-1,-1],
+		[0, -1],
+		// [1, -1],
+		[1, 0],
+		// [1, 1],
+		[0, 1],
+		// [-1, 1],
+		[-1, 0]
+	];
 
-//very imcomplete function...
-// function brushSize(cell) {
-
-// 	cell.style.backgroundColor = cellColorOnAlive
-// 	// need to find current color and factor in that it will have been changed by hovering over it... need some buffer action!!!
-// 	//x is first for vectors and y is second. Unfortunately the opposite of the situation below...
-
-// 	function createVectors() {
-// 		let brushSize = 3;
-// 		let baseVectors = [
-// 			[-1, -1],
-// 			[0, -1],
-// 			[1, -1],
-// 			[1, 0],
-// 			[1, 1],
-// 			[0, 1],
-// 			[-1, 1],
-// 			[-1, 0]
-// 		];
-//         let directionVectors = []
-
-// 		for(let i= 1; i<brushSize; i++) {
-// 			baseVectors.forEach(function(element){
-// 				let newVector = [];
-// 				newVector.push(i*element[0]);
-// 				newVector.push(i*element[1]);
-// 				directionVectors.push(newVector);
-// 			});
-// 		}
-
-// 		return directionVectors;
-// 	}
-
-//     let directionVectors = createVectors();
-//     console.log(directionVectors);
-// 	//second is X second is Y fisrt... 
-// 	directionVectors.forEach(function(element){
-// 		if(row[cell.coordinates[1] + element[1]] && row[cell.coordinates[1] + element[1]][cell.coordinates[0] + element[0]]) {
-// 			row[cell.coordinates[1] + element[1]][cell.coordinates[0] + element[0]].style.backgroundColor = cellColorOnAlive;
-// 		}
-// 	});
-// }
+	coordinates.forEach(function(element){
+		// floodFill(xCoordinate + 1, yCoordinate + 1, fillColor, regionColor);
+		floodFill(xCoordinate + element[0], yCoordinate + element[1], fillColor, regionColor);
+	});
+}
 
 
 
