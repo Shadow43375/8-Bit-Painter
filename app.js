@@ -1,4 +1,5 @@
 var dragRect = [];
+var dragLine = [];
 var coveredColumn = [];
 var coveredRow = [];
 var firstCellOfDrag = undefined;
@@ -12,7 +13,7 @@ var row = [];
 var column = [];
 var pressed = {};
 var gridColor = "0.1vw solid black";
-let numberOfRows = 32,
+let numberOfRows = 16,
     numberOfColumns = numberOfRows;
 let cellDimension = (1/numberOfRows)*100;
 let r = 83,
@@ -42,11 +43,14 @@ function downClickCell() {
 		lastCellOfDrag = this;
 	}
 
+	else if(mode==="lineTool") {
+		firstCellOfDrag = this;
+		lastCellOfDrag = this;
+	}
+
 	else if(mode === "colorPick") {
 	   	cellColorOnAlive = this.style.backgroundColor;
         colorPicker.jscolor.fromString(cellColorOnAlive);
-	   	// console(cellColorOnAlive);
-	   	// update(colorPicker);
 	}
 
 	else if(mode === 'floodFill') {
@@ -67,8 +71,7 @@ function changeCursor(resourcePath) {
 
 var mode = 'paint';
 
-function brush() {	
-   // seems to be a problem with the pressed object... parent processes event NOT child UGGGHHHHHH
+function brush() {
    lastCellOfDrag = this;
    if(pressed["mousedown"] === true) {
 	   if(mode === "paint") {
@@ -80,30 +83,26 @@ function brush() {
 	   	} 
 
 	   	else if(mode === 'rectangleTool') {
-        	console.log("we are calling some paint here!")
         	rectanglePaint();
         	lastCellOfDrag = undefined;	   		
 	   	}
 
+	   	else if(mode === 'lineTool') {
+        	// console.log("we are calling some LINE paint here!")
+        	// linePaint();
+        	// lastCellOfDrag = undefined;	   		
+	   	}	   	
+
 
    }
-
-   // // else if(pressed["mousedown"] !== true && this.style.backgroundColor === "white") {
-   // else if(pressed["mousedown"] !== true) {
-   // 		// console.log("lets see now if we should draw...");
-   //   //    if(firstCellOfDrag && lastCellOfDrag) {
-
-   //      // }
-   //      if (this.style.backgroundColor === "white") {
-			// this.style.backgroundColor = "rgba(205, 253, 253, 0.7)";
-   //      }
-   // }
 
 }
 
 function mouseUpDetector() {
 	console.log("up on " + this.coordinates);
-	// lastCellOfDrag = this;
+        	console.log("we are calling some LINE paint here!")
+        	linePaint();
+        	lastCellOfDrag = undefined;	
 }
 
 
@@ -121,9 +120,6 @@ brush.prototype.changeMode = function(newMode) {
 	}
 	else if(newMode === "colorPick") {
 		mode = newMode;
-		// changeCursor("url('resources/color-dropper.png'), auto");
-		// changeCursor("url('resources/pencil-cursor.png'), auto");
-		// changeCursor("url('resources/eraser.png'), auto");
 		changeCursor("url('resources/color-dropper-medium.png'), auto");
 
 	}
@@ -139,6 +135,10 @@ brush.prototype.changeMode = function(newMode) {
 		mode = newMode;
 	    changeCursor("url('resources/pencil-cursor.png'), auto");
 	}
+	else if(newMode === "lineTool") {
+		mode = newMode;
+	    changeCursor("url('resources/pencil-cursor.png'), auto");
+	}
     else {
     	console.log("ERROR: " + newMode + "is not a valid brush mode");
     }
@@ -146,14 +146,10 @@ brush.prototype.changeMode = function(newMode) {
 
 
 function rectanglePaint() {
-	console.log("lets paint!!!");
-	console.log("first point of drag = " + "(" + firstCellOfDrag.coordinates[0] + "," + firstCellOfDrag.coordinates[1] + ")");
-	console.log("last point of drag = " + "(" + lastCellOfDrag.coordinates[0] + "," + lastCellOfDrag.coordinates[1] + ")");
 
 //need to erase as normal and then create from stored covered state
 	if(dragRect[0]) {
 		drawRect(dragRect[0], dragRect[1], false);
-		// writeRect(dragRect[0], dragRect[1]);
 		dragRect.pop();
 		dragRect.pop();
 	}
@@ -230,6 +226,126 @@ function rectanglePaint() {
 }
 
 
+
+function linePaint() {
+	console.log("lets paint!!!");
+	console.log("first point of drag = " + "(" + firstCellOfDrag.coordinates[0] + "," + firstCellOfDrag.coordinates[1] + ")");
+	console.log("last point of drag = " + "(" + lastCellOfDrag.coordinates[0] + "," + lastCellOfDrag.coordinates[1] + ")");
+
+    function compare(number1, number2, select) {
+    	let difference = number2 - number1;
+    	if(difference<0) {
+    		if(select === "smaller") {
+    			return number2
+    		}
+    		else if(select === "greater") {
+    			return number1;
+    		}
+    	}
+    	else if(difference>0) {
+    		if(select === "smaller") {
+    			return number1;
+    		}
+    		else if(select === "greater") {
+    			return number2;
+    		}
+    	}
+    	else if(difference===0) {
+    		return number1;
+    	}
+    }
+
+    let horizontalDiff = Math.abs(lastCellOfDrag.coordinates[0] - firstCellOfDrag.coordinates[0]);
+    let verticalDiff = Math.abs(lastCellOfDrag.coordinates[1] - firstCellOfDrag.coordinates[1]);
+
+    if(horizontalDiff >= verticalDiff) {
+	    let x1 = firstCellOfDrag.coordinates[0];
+	    let y1 = firstCellOfDrag.coordinates[1];
+	    let x2 = lastCellOfDrag.coordinates[0];
+	    let y2 = lastCellOfDrag.coordinates[1];
+	    let slope = (y2-y1)/(x2-x1);
+
+	    if(x2 - x1 < 0) {
+	    	console.log("second x less then...")
+		    x1 = lastCellOfDrag.coordinates[0];
+		    y1 = lastCellOfDrag.coordinates[1];
+		    x2 = firstCellOfDrag.coordinates[0];
+		    y2 = firstCellOfDrag.coordinates[1];
+		    slope = (y2-y1)/(x2-x1);
+	    }
+
+
+	// need to either decrement x while incrementing y or decrement y while incrementing x. While need to use (y2 - y1 to control flipping);
+
+
+		let slope_error = 0;
+		for (let x = x1; x <= x2; x++) {    
+			console.log("(" + x + "," + y1 + ")");
+			row[y1][x].style.backgroundColor = cellColorOnAlive;
+
+		      // Add slope to increment angle formed
+		      slope_error += Math.abs(slope); 
+		  
+		      // Slope error reached limit, time to increment
+		      // y and update slope error.
+		      if (slope_error >= 0.5)  {
+		         if(y2 - y1 < 0) {
+		         	y1--
+		         }
+		         else if(y2-y1 >=0) {
+		          y1++;
+		         }              
+		         slope_error  -= 1.0;    
+		      }
+		   }
+    }
+
+    else if(horizontalDiff < verticalDiff) {
+ 	    let x1 = firstCellOfDrag.coordinates[0];
+	    let y1 = firstCellOfDrag.coordinates[1];
+	    let x2 = lastCellOfDrag.coordinates[0];
+	    let y2 = lastCellOfDrag.coordinates[1];
+	    let slope = (y2-y1)/(x2-x1);
+
+	    if(y2 - y1 < 0) {
+	    	console.log("second y less then...")
+		    x1 = lastCellOfDrag.coordinates[0];
+		    y1 = lastCellOfDrag.coordinates[1];
+		    x2 = firstCellOfDrag.coordinates[0];
+		    y2 = firstCellOfDrag.coordinates[1];
+		    slope = (y2-y1)/(x2-x1);
+	    }
+
+
+	// need to either decrement x while incrementing y or decrement y while incrementing x. While need to use (y2 - y1 to control flipping);
+
+
+		let slope_error = 0;
+		for (let y = y1; y <= y2; y++) {    
+			console.log("(" + x1 + "," + y + ")");
+			row[y][x1].style.backgroundColor = cellColorOnAlive;
+
+		      // Add slope to increment angle formed
+		      slope_error += Math.abs(1/slope); 
+		  
+		      // Slope error reached limit, time to increment
+		      // y and update slope error.
+		      if (slope_error >= 0.5)  {
+		         if(x2 - x1 < 0) {
+		         	x1--
+		         }
+		         else if(x2-x1 >=0) {
+		          x1++;
+		         }              
+		         slope_error  -= 1.0;    
+		      }
+		   }   	
+    }
+	
+}
+
+
+
 function floodFill(xCoordinate, yCoordinate, fillColor, regionColor) {
 
 //modify to deal with row/coordinates rather than cell...
@@ -244,24 +360,17 @@ function floodFill(xCoordinate, yCoordinate, fillColor, regionColor) {
 		console.log("nope: not fill region");
 		return
 	}
-		
-	console.log("from floodFill: ");
-	console.log("(" + xCoordinate + "," + yCoordinate + ")");
+
 	row[yCoordinate][xCoordinate].style.backgroundColor = cellColorOnAlive;
 
 	var coordinates = [
-		// [-1,-1],
 		[0, -1],
-		// [1, -1],
 		[1, 0],
-		// [1, 1],
 		[0, 1],
-		// [-1, 1],
 		[-1, 0]
 	];
 
 	coordinates.forEach(function(element){
-		// floodFill(xCoordinate + 1, yCoordinate + 1, fillColor, regionColor);
 		floodFill(xCoordinate + element[0], yCoordinate + element[1], fillColor, regionColor);
 	});
 }
@@ -365,11 +474,14 @@ document.getElementById('paintButton').addEventListener('click', function() {
 
 document.getElementById('colorPickerButton').addEventListener('click', function() {
 	brush.prototype.changeMode('colorPick');
-	// alert("Hi");
 });
 
 document.getElementById('rectangleButton').addEventListener('click', function() {
     brush.prototype.changeMode('rectangleTool');
+});
+
+document.getElementById('lineButton').addEventListener('click', function() {
+	brush.prototype.changeMode('lineTool');
 });
 
 document.getElementById('eraseButton').addEventListener('click', function() {
@@ -527,12 +639,19 @@ window.onmouseup = function(event){
      pressed["mousedown"] = false;
      delete pressed["mousedown"];
      if(mode === "rectangleTool") {
-     	console.log("lets see if the brush function runs after this...");
      	brush.call(lastCellOfDrag);
         firstCellOfDrag = undefined;
         dragRect = [];
         coveredColumn = [];
         coveredRow = [];
+     }
+     if(mode === "lineTool") {
+     	console.log("lets see if the brush function runs after this line stuff...");
+     	brush.call(lastCellOfDrag);
+        firstCellOfDrag = undefined;
+        dragLine = [];
+        // coveredColumn = [];
+        // coveredRow = [];
      }
      if(isChanged()) {
      	addState();
