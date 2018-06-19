@@ -13,7 +13,7 @@ var row = [];
 var column = [];
 var pressed = {};
 var gridColor = "0.1vw solid black";
-let numberOfRows = 16,
+let numberOfRows = 32,
     numberOfColumns = numberOfRows;
 let cellDimension = (1/numberOfRows)*100;
 let r = 83,
@@ -31,7 +31,10 @@ function update(jscolor) {
 
 function downClickCell() {
 	if(mode==="paint") {
-		this.style.backgroundColor  = cellColorOnAlive;	
+		firstCellOfDrag = this;
+		lastCellOfDrag = this;
+		linePaint();
+		// this.style.backgroundColor  = cellColorOnAlive;
 	}
 	else if(mode==="erase") {
 		this.style.backgroundColor = "white";
@@ -75,7 +78,11 @@ function brush() {
    lastCellOfDrag = this;
    if(pressed["mousedown"] === true) {
 	   if(mode === "paint") {
-			this.style.backgroundColor = cellColorOnAlive;	
+			// this.style.backgroundColor = cellColorOnAlive;	
+			lastCellOfDrag = this;
+			linePaint();
+			firstCellOfDrag = lastCellOfDrag;
+			console.log("greetings from dah brush!");
 	   }
 
 	   	else if(mode === "erase") {
@@ -100,9 +107,11 @@ function brush() {
 
 function mouseUpDetector() {
 	console.log("up on " + this.coordinates);
-        	console.log("we are calling some LINE paint here!")
-        	linePaint();
-        	lastCellOfDrag = undefined;	
+	if(mode === "lineTool") {
+        console.log("we are calling some LINE paint here!")
+        linePaint();
+        lastCellOfDrag = undefined;	
+	}
 }
 
 
