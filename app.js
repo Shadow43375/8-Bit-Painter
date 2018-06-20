@@ -95,9 +95,9 @@ function brush() {
 	   	}
 
 	   	else if(mode === 'lineTool') {
-        	// console.log("we are calling some LINE paint here!")
-        	// linePaint();
-        	// lastCellOfDrag = undefined;	   		
+        	console.log("we are calling some LINE paint here!")
+        	linePaint();
+        	lastCellOfDrag = undefined;	   		
 	   	}	   	
 
 
@@ -230,16 +230,28 @@ function rectanglePaint() {
 	// writeRect(dragRect[0], dragRect[1]);
 	storeRect([0, 0], [numberOfRows - 1, numberOfRows - 1]);
 	writeRect([0, 0], [numberOfRows - 1, numberOfRows - 1]);
-    drawRect(firstCellOfDrag.coordinates, lastCellOfDrag.coordinates, "draw");
+    drawRect(firstCellOfDrag.coordinates, lastCellOfDrag.coordinates, true);
 
 }
 
 
 
 function linePaint() {
+
 	console.log("lets paint!!!");
 	console.log("first point of drag = " + "(" + firstCellOfDrag.coordinates[0] + "," + firstCellOfDrag.coordinates[1] + ")");
 	console.log("last point of drag = " + "(" + lastCellOfDrag.coordinates[0] + "," + lastCellOfDrag.coordinates[1] + ")");
+
+
+	if(dragLine[0]) {
+		if(mode === "lineTool") {
+			drawLine(dragLine[0], dragLine[1], false);			
+		}
+		dragLine.pop();
+		dragLine.pop();
+	}
+
+
 
     function compare(number1, number2, select) {
     	let difference = number2 - number1;
@@ -264,22 +276,24 @@ function linePaint() {
     	}
     }
 
-    let horizontalDiff = Math.abs(lastCellOfDrag.coordinates[0] - firstCellOfDrag.coordinates[0]);
-    let verticalDiff = Math.abs(lastCellOfDrag.coordinates[1] - firstCellOfDrag.coordinates[1]);
+
+   function drawLine(point1, point2, draw) {
+   let horizontalDiff = Math.abs(point2[0] - point1[0]);
+    let verticalDiff = Math.abs(point2[1] - point1[1]);
 
     if(horizontalDiff >= verticalDiff) {
-	    let x1 = firstCellOfDrag.coordinates[0];
-	    let y1 = firstCellOfDrag.coordinates[1];
-	    let x2 = lastCellOfDrag.coordinates[0];
-	    let y2 = lastCellOfDrag.coordinates[1];
+	    let x1 = point1[0];
+	    let y1 = point1[1];
+	    let x2 = point2[0];
+	    let y2 = point2[1];
 	    let slope = (y2-y1)/(x2-x1);
 
 	    if(x2 - x1 < 0) {
 	    	console.log("second x less then...")
-		    x1 = lastCellOfDrag.coordinates[0];
-		    y1 = lastCellOfDrag.coordinates[1];
-		    x2 = firstCellOfDrag.coordinates[0];
-		    y2 = firstCellOfDrag.coordinates[1];
+		    x1 = point2[0];
+		    y1 = point2[1];
+		    x2 = point1[0];
+		    y2 = point1[1];
 		    slope = (y2-y1)/(x2-x1);
 	    }
 
@@ -290,7 +304,13 @@ function linePaint() {
 		let slope_error = 0;
 		for (let x = x1; x <= x2; x++) {    
 			console.log("(" + x + "," + y1 + ")");
-			row[y1][x].style.backgroundColor = cellColorOnAlive;
+			if(draw) {
+				row[y1][x].style.backgroundColor = cellColorOnAlive;			
+			}
+			else if(!draw) {
+				row[y1][x].style.backgroundColor = 'white';				
+			}
+
 
 		      // Add slope to increment angle formed
 		      slope_error += Math.abs(slope); 
@@ -310,29 +330,32 @@ function linePaint() {
     }
 
     else if(horizontalDiff < verticalDiff) {
- 	    let x1 = firstCellOfDrag.coordinates[0];
-	    let y1 = firstCellOfDrag.coordinates[1];
-	    let x2 = lastCellOfDrag.coordinates[0];
-	    let y2 = lastCellOfDrag.coordinates[1];
+ 	    let x1 = point1[0];
+	    let y1 = point1[1];
+	    let x2 = point2[0];
+	    let y2 = point2[1];
 	    let slope = (y2-y1)/(x2-x1);
 
 	    if(y2 - y1 < 0) {
 	    	console.log("second y less then...")
-		    x1 = lastCellOfDrag.coordinates[0];
-		    y1 = lastCellOfDrag.coordinates[1];
-		    x2 = firstCellOfDrag.coordinates[0];
-		    y2 = firstCellOfDrag.coordinates[1];
+		    x1 = point2[0];
+		    y1 = point2[1];
+		    x2 = point1[0];
+		    y2 = point1[1];
 		    slope = (y2-y1)/(x2-x1);
 	    }
-
-
-	// need to either decrement x while incrementing y or decrement y while incrementing x. While need to use (y2 - y1 to control flipping);
 
 
 		let slope_error = 0;
 		for (let y = y1; y <= y2; y++) {    
 			console.log("(" + x1 + "," + y + ")");
-			row[y][x1].style.backgroundColor = cellColorOnAlive;
+			if(draw) {
+				row[y][x1].style.backgroundColor = cellColorOnAlive;			
+			}
+			else if(!draw) {
+				row[y][x1].style.backgroundColor = 'white';				
+			}
+
 
 		      // Add slope to increment angle formed
 		      slope_error += Math.abs(1/slope); 
@@ -350,6 +373,17 @@ function linePaint() {
 		      }
 		   }   	
     }
+ }
+
+ 
+
+   	dragLine.push(firstCellOfDrag.coordinates);
+	dragLine.push(lastCellOfDrag.coordinates);
+	if(mode === "lineTool") {
+		// storeRect([0, 0], [numberOfRows - 1, numberOfRows - 1]);
+		// writeRect([0, 0], [numberOfRows - 1, numberOfRows - 1]);		
+	}
+    drawLine(firstCellOfDrag.coordinates, lastCellOfDrag.coordinates, true);
 	
 }
 
