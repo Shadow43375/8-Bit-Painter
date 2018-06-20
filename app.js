@@ -6,6 +6,8 @@ var coveredLineColumn = [];
 var coveredLineRow = [];
 var firstCellOfDrag = undefined;
 var lastCellOfDrag = undefined;
+var mode = 'paint';
+var mixing = false;
 var state = {
 	stateIndex: 0,
     endIndex: 0,
@@ -24,7 +26,7 @@ let r = 83,
 var cellColorOnAlive =  "rgb(" + r + ", " + g + ", " + b + ")"; 
 let exportSize = 400;
 var colorPicker = document.getElementById('colorPicker');
-var container = document.getElementById('container')
+var container = document.getElementById('container');
 
 function update(jscolor) {
 	console.log("color changed");
@@ -36,7 +38,6 @@ function downClickCell() {
 		firstCellOfDrag = this;
 		lastCellOfDrag = this;
 		linePaint();
-		// this.style.backgroundColor  = cellColorOnAlive;
 	}
 	else if(mode==="erase") {
 		this.style.backgroundColor = "white";
@@ -74,8 +75,6 @@ function changeCursor(resourcePath) {
 }
 
 
-var mode = 'paint';
-
 function brush() {
    lastCellOfDrag = this;
    if(pressed["mousedown"] === true) {
@@ -107,22 +106,6 @@ function brush() {
 
 }
 
-function mouseUpDetector() {
-	console.log("up on " + this.coordinates);
-	if(mode === "lineTool") {
-        console.log("we are calling some LINE paint here!")
-        linePaint();
-        console.log("we are DONE with some line paint here!");
-        lastCellOfDrag = undefined;	
-	}
-}
-
-
-function hoverOffEffect() {
-	if(pressed["mousedown"] !== true && this.style.backgroundColor === "rgba(205, 253, 253, 0.7)") {   
-      this.style.backgroundColor = "white";
-   }	
-}
 
 brush.prototype.changeMode = function(newMode) {
 
@@ -154,6 +137,36 @@ brush.prototype.changeMode = function(newMode) {
     else {
     	console.log("ERROR: " + newMode + "is not a valid brush mode");
     }
+}
+
+
+brush.prototype.changeCellColor = function(x, y) {
+	let colorArray = [];
+	colorArray.push(cellColorOnAlive);
+	colorArray.push(row[y][x].style.backgroundColor);
+	if(mixing === true) {
+		row[y][x].style.backgroundColor = chroma.average(colorArray).hex()
+	}	
+	else if(mixing === false) {
+		row[y][x].style.backgroundColor = cellColorOnAlive;
+	} 
+}
+
+function mouseUpDetector() {
+	console.log("up on " + this.coordinates);
+	if(mode === "lineTool") {
+        console.log("we are calling some LINE paint here!")
+        linePaint();
+        console.log("we are DONE with some line paint here!");
+        lastCellOfDrag = undefined;	
+	}
+}
+
+
+function hoverOffEffect() {
+	if(pressed["mousedown"] !== true && this.style.backgroundColor === "rgba(205, 253, 253, 0.7)") {   
+      this.style.backgroundColor = "white";
+   }	
 }
 
 
@@ -218,7 +231,7 @@ function rectanglePaint() {
 	    	for(let j = compare(point1[1], point2[1], "smaller"); j<=compare(point1[1], point2[1], "greater"); j++) {
 	    		console.log("(" + i + "," + j + ")");
 	    		if(draw) {
-	    			row[j][i].style.backgroundColor = cellColorOnAlive;
+	    			brush.prototype.changeCellColor(i, j);
 	    		}
 	    		else if(!draw) {
 	    			row[j][i].style.backgroundColor = 'white';
@@ -304,7 +317,8 @@ function linePaint() {
 		for (let x = x1; x <= x2; x++) {    
 			console.log("(" + x + "," + y1 + ")");
 			if(draw) {
-				row[y1][x].style.backgroundColor = cellColorOnAlive;			
+				// row[y1][x].style.backgroundColor = cellColorOnAlive;		
+				row[y1][x].style.backgroundColor = brush.prototype.changeCellColor(x, y1);	
 			}
 			else if(!draw) {
 				row[y1][x].style.backgroundColor = 'white';				
@@ -349,7 +363,8 @@ function linePaint() {
 		for (let y = y1; y <= y2; y++) {    
 			console.log("(" + x1 + "," + y + ")");
 			if(draw) {
-				row[y][x1].style.backgroundColor = cellColorOnAlive;			
+				// row[y][x1].style.backgroundColor = cellColorOnAlive;		
+				row[y][x1].style.backgroundColor = brush.prototype.changeCellColor(x1, y);	
 			}
 			else if(!draw) {
 				row[y][x1].style.backgroundColor = 'white';				
@@ -427,7 +442,8 @@ function floodFill(xCoordinate, yCoordinate, fillColor, regionColor) {
 		return
 	}
 
-	row[yCoordinate][xCoordinate].style.backgroundColor = cellColorOnAlive;
+	// row[yCoordinate][xCoordinate].style.backgroundColor = cellColorOnAlive;
+	brush.prototype.changeCellColor(xCoordinate, yCoordinate);
 
 	var coordinates = [
 		[0, -1],
@@ -556,6 +572,17 @@ document.getElementById('eraseButton').addEventListener('click', function() {
 
 document.getElementById('floodFillButton').addEventListener('click', function(){
 	brush.prototype.changeMode('floodFill');
+});
+
+
+document.getElementById('colorMixingCheckBox').addEventListener( 'change', function() {
+    if(this.checked) {
+    	mixing = true;
+    	alert(mixing);
+    } else {
+    	mixing = false;
+    	alert(mixing);
+    }
 });
 
 
