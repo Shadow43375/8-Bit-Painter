@@ -2,6 +2,8 @@ var dragRect = [];
 var dragLine = [];
 var coveredColumn = [];
 var coveredRow = [];
+var coveredLineColumn = [];
+var coveredLineRow = [];
 var firstCellOfDrag = undefined;
 var lastCellOfDrag = undefined;
 var state = {
@@ -97,7 +99,7 @@ function brush() {
 	   	else if(mode === 'lineTool') {
         	console.log("we are calling some LINE paint here!")
         	linePaint();
-        	lastCellOfDrag = undefined;	   		
+        	// lastCellOfDrag = undefined;	   		
 	   	}	   	
 
 
@@ -110,6 +112,7 @@ function mouseUpDetector() {
 	if(mode === "lineTool") {
         console.log("we are calling some LINE paint here!")
         linePaint();
+        console.log("we are DONE with some line paint here!");
         lastCellOfDrag = undefined;	
 	}
 }
@@ -237,10 +240,6 @@ function rectanglePaint() {
 
 
 function linePaint() {
-
-	console.log("lets paint!!!");
-	console.log("first point of drag = " + "(" + firstCellOfDrag.coordinates[0] + "," + firstCellOfDrag.coordinates[1] + ")");
-	console.log("last point of drag = " + "(" + lastCellOfDrag.coordinates[0] + "," + lastCellOfDrag.coordinates[1] + ")");
 
 
 	if(dragLine[0]) {
@@ -375,13 +374,37 @@ function linePaint() {
     }
  }
 
+
+
+    function storeRect(point1, point2) {
+	    for(let i = compare(point1[0], point2[0], "smaller"); i<=compare(point1[0], point2[0], "greater"); i++) {
+	    	for(let j = compare(point1[1], point2[1], "smaller"); j<=compare(point1[1], point2[1], "greater"); j++) {
+	    		if(!coveredLineRow[i] || (coveredLineRow[i])) {
+	    			coveredLineColumn.push(row[j][i].style.backgroundColor);
+	    		}
+	    	}
+	    	if(!coveredLineRow[i]) {
+		    	coveredLineRow.push(coveredLineColumn);
+		        coveredLineColumn = [];
+	    	}
+	    }    	
+    }
+
+    function writeRect(point1, point2) {
+ 	    for(let i = compare(point1[0], point2[0], "smaller"); i<=compare(point1[0], point2[0], "greater"); i++) {
+	    	for(let j = compare(point1[1], point2[1], "smaller"); j<=compare(point1[1], point2[1], "greater"); j++) {
+	    			row[j][i].style.backgroundColor = coveredLineRow[i][j];
+	    	}
+	    }      	
+    }
+
  
 
    	dragLine.push(firstCellOfDrag.coordinates);
 	dragLine.push(lastCellOfDrag.coordinates);
 	if(mode === "lineTool") {
-		// storeRect([0, 0], [numberOfRows - 1, numberOfRows - 1]);
-		// writeRect([0, 0], [numberOfRows - 1, numberOfRows - 1]);		
+		storeRect([0, 0], [numberOfRows - 1, numberOfRows - 1]);
+		writeRect([0, 0], [numberOfRows - 1, numberOfRows - 1]);		
 	}
     drawLine(firstCellOfDrag.coordinates, lastCellOfDrag.coordinates, true);
 	
@@ -693,8 +716,8 @@ window.onmouseup = function(event){
      	brush.call(lastCellOfDrag);
         firstCellOfDrag = undefined;
         dragLine = [];
-        // coveredColumn = [];
-        // coveredRow = [];
+        coveredLineColumn = [];
+        coveredLineRow = [];
      }
      if(isChanged()) {
      	addState();
