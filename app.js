@@ -6,6 +6,7 @@ var coveredLineColumn = [];
 var coveredLineRow = [];
 var firstCellOfDrag = undefined;
 var lastCellOfDrag = undefined;
+var formerLastCellOfDrag = undefined;
 var mode = 'paint';
 var mixing = false;
 var state = {
@@ -37,6 +38,8 @@ function downClickCell() {
 	if(mode==="paint") {
 		firstCellOfDrag = this;
 		lastCellOfDrag = this;
+		formerLastCellOfDrag = lastCellOfDrag;
+		row[this.coordinates[1]][this.coordinates[0]].style.backgroundColor = brush.prototype.changeCellColor(this.coordinates[0], this.coordinates[1]);
 		linePaint();
 	}
 	else if(mode==="erase") {
@@ -78,10 +81,10 @@ function changeCursor(resourcePath) {
 function brush() {
    lastCellOfDrag = this;
    if(pressed["mousedown"] === true) {
-	   if(mode === "paint") {
-			// this.style.backgroundColor = cellColorOnAlive;	
+	   if(mode === "paint") {	
 			lastCellOfDrag = this;
 			linePaint();
+			formerLastCellOfDrag = lastCellOfDrag;
 			firstCellOfDrag = lastCellOfDrag;
 			console.log("greetings from dah brush!");
 	   }
@@ -98,7 +101,7 @@ function brush() {
 	   	else if(mode === 'lineTool') {
         	console.log("we are calling some LINE paint here!")
         	linePaint();
-        	// lastCellOfDrag = undefined;	   		
+  	   		
 	   	}	   	
 
 
@@ -290,8 +293,12 @@ function linePaint() {
 
 
    function drawLine(point1, point2, draw) {
+
+   console.log("point1 = " + point1);
+   console.log("point2 = " + point2);
+   console.log("formerLastCellOfDrag = " + formerLastCellOfDrag.coordinates[0] + "," + formerLastCellOfDrag.coordinates[1]);
    let horizontalDiff = Math.abs(point2[0] - point1[0]);
-    let verticalDiff = Math.abs(point2[1] - point1[1]);
+   let verticalDiff = Math.abs(point2[1] - point1[1]);
 
     if(horizontalDiff >= verticalDiff) {
 	    let x1 = point1[0];
@@ -314,14 +321,20 @@ function linePaint() {
 
 
 		let slope_error = 0;
+		let y = y1;
 		for (let x = x1; x <= x2; x++) {    
-			console.log("(" + x + "," + y1 + ")");
 			if(draw) {
-				// row[y1][x].style.backgroundColor = cellColorOnAlive;		
-				row[y1][x].style.backgroundColor = brush.prototype.changeCellColor(x, y1);	
+				console.log("currentX = " + x);
+				console.log("formerLastCellOfDrag,coordinates[0] = " + formerLastCellOfDrag.coordinates[0]);
+				console.log("currentY = " + y);
+				console.log("formerLastCellOfDrag.coordinates[1] = " + formerLastCellOfDrag.coordinates[1]);
+				if(x !== formerLastCellOfDrag.coordinates[0] || y !== formerLastCellOfDrag.coordinates[1]) {
+					row[y][x].style.backgroundColor = brush.prototype.changeCellColor(x, y);					
+				}
+	
 			}
 			else if(!draw) {
-				row[y1][x].style.backgroundColor = 'white';				
+				row[y][x].style.backgroundColor = 'white';				
 			}
 
 
@@ -331,11 +344,11 @@ function linePaint() {
 		      // Slope error reached limit, time to increment
 		      // y and update slope error.
 		      if (slope_error >= 0.5)  {
-		         if(y2 - y1 < 0) {
-		         	y1--
+		         if(y2 - y < 0) {
+		         	y--
 		         }
-		         else if(y2-y1 >=0) {
-		          y1++;
+		         else if(y2-y >=0) {
+		          y++;
 		         }              
 		         slope_error  -= 1.0;    
 		      }
@@ -350,7 +363,6 @@ function linePaint() {
 	    let slope = (y2-y1)/(x2-x1);
 
 	    if(y2 - y1 < 0) {
-	    	console.log("second y less then...")
 		    x1 = point2[0];
 		    y1 = point2[1];
 		    x2 = point1[0];
@@ -358,16 +370,20 @@ function linePaint() {
 		    slope = (y2-y1)/(x2-x1);
 	    }
 
-
+	    let x = x1;
 		let slope_error = 0;
 		for (let y = y1; y <= y2; y++) {    
-			console.log("(" + x1 + "," + y + ")");
 			if(draw) {
-				// row[y][x1].style.backgroundColor = cellColorOnAlive;		
-				row[y][x1].style.backgroundColor = brush.prototype.changeCellColor(x1, y);	
+				console.log("currentX = " + x);
+				console.log("formerLastCellOfDrag,coordinates[0] = " + formerLastCellOfDrag.coordinates[0]);
+				console.log("currentY = " + y);
+				console.log("formerLastCellOfDrag.coordinates[1] = " + formerLastCellOfDrag.coordinates[1]);
+				if(x !== formerLastCellOfDrag.coordinates[0] || y !== formerLastCellOfDrag.coordinates[1]) {
+					row[y][x].style.backgroundColor = brush.prototype.changeCellColor(x, y);					
+				}	
 			}
 			else if(!draw) {
-				row[y][x1].style.backgroundColor = 'white';				
+				row[y][x].style.backgroundColor = 'white';				
 			}
 
 
@@ -377,11 +393,11 @@ function linePaint() {
 		      // Slope error reached limit, time to increment
 		      // y and update slope error.
 		      if (slope_error >= 0.5)  {
-		         if(x2 - x1 < 0) {
-		         	x1--
+		         if(x2 - x < 0) {
+		         	x--
 		         }
-		         else if(x2-x1 >=0) {
-		          x1++;
+		         else if(x2-x >=0) {
+		          x++;
 		         }              
 		         slope_error  -= 1.0;    
 		      }
@@ -578,10 +594,8 @@ document.getElementById('floodFillButton').addEventListener('click', function(){
 document.getElementById('colorMixingCheckBox').addEventListener( 'change', function() {
     if(this.checked) {
     	mixing = true;
-    	alert(mixing);
     } else {
     	mixing = false;
-    	alert(mixing);
     }
 });
 
