@@ -55,6 +55,12 @@ function downClickCell() {
 	else if(mode==="lineTool") {
 		firstCellOfDrag = this;
 		lastCellOfDrag = this;
+		formerLastCellOfDrag = lastCellOfDrag;
+		dragLine = [];
+		console.log("LINE reseting cells");
+		console.log("firstCellOfDrag.coordinates = " + firstCellOfDrag.coordinates);
+		console.log("lastCellOfDrag.coordinates = " + lastCellOfDrag.coordinates);
+		row[this.coordinates[1]][this.coordinates[0]].style.backgroundColor = brush.prototype.changeCellColor(this.coordinates[0], this.coordinates[1]);
 	}
 
 	else if(mode === "colorPick") {
