@@ -2,7 +2,6 @@
 <html>
 <head>
 	<title></title>
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
 	<link rel="stylesheet" type="text/css" href="style.css">
 	<script src="jscolor.js"></script>
     <script type="text/javascript" src="bower_components/chroma-js/chroma.js"></script>
@@ -17,23 +16,11 @@
 
 	</div>
 	
-	<input id="colorMixingCheckBox" type="checkbox" name="colorMixing" value="NonMxing"> Enable Color Mixing
 	<button id='randomButton'>Randomize</button>
 	<button id='exportButton'>Export</button>
-	<button class="brushControlButton" id='paintButton'><i class="fa fa-pencil-alt"></i></button>
-	<button class="brushControlButton" id='colorPickerButton'><i class="fa fa-eye-dropper"></i></button>
-	<button class="brushControlButton" id='rectangleButton'>Rectangle</button>
-	<button class="brushControlButton" id='lineButton'>Line</button>
-	<button class="brushControlButton" id='eraseButton'><i class="fa fa-eraser"></i></button>
-	<button class="brushControlButton" id='floodFillButton'>Flood Fill</i></button>
-	<button class="brushControlButton" id='gridToggleButton'>Grid Toggle</button>
-	<button id='clearButton'>Clear</button>
-    <button id='undoButton'><---</button>
-    <button id='redoButton'>---></button>
+	<button id='changeModeButton'>Change Mode</button>
 
-
-    <input class="jscolor {onFineChange:'update(this)', valueElement:null,value:'536d59'}" id='colorPicker'></button>
-<!--     <input id='colorPicker'></button> -->
+    <input class="jscolor {onFineChange:'update(this)'}" id='colorPicker'></button>
     <canvas id="myCanvas" style="display: none">
     Your browser does not support the HTML5 canvas tag.</canvas> 
 
