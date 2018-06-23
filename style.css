@@ -4,13 +4,25 @@
 	box-sizing: border-box;
 }
 
-#container {
+#interfaceArea {
 	position: absolute;
 	top: 50%;
 	left: 50%;
  	transform: translate(-50%, -50%);
 	height: 500px;
-	width: 500px;
+	width: 500px;	
+	border: solid 1px black;
+}
+
+#container {
+/*	position: absolute;
+	top: 50%;
+	left: 50%;
+ 	transform: translate(-50%, -50%);*/
+/*	height: 500px;
+	width: 500px;*/
+	height: 100%;
+	width: 100%;
 	display: flex;
 	flex-wrap: wrap;
 	z-index: 0;
@@ -22,6 +34,24 @@
 	background-color: white;
 	border: 1px solid grey;
 	cursor: pointer;
+}
+
+button {
+  -webkit-border-radius: 28;
+  -moz-border-radius: 28;
+  border-radius: 6px;
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 20px;
+  background: #2b3338;
+  padding: 10px 20px 10px 20px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #575757;
+  text-decoration: none;
 }
 
 .hidden {

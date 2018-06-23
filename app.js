@@ -18,7 +18,7 @@ var row = [];
 var column = [];
 var pressed = {};
 var gridColor = "0.1vw solid grey";
-let numberOfRows = 32,
+let numberOfRows = 16,
     numberOfColumns = numberOfRows;
 let cellDimension = (1/numberOfRows)*100;
 let r = 83,
@@ -502,7 +502,7 @@ for(let i=0; i<numberOfRows;i++) {
 	column = [];
 }
 
-document.body.appendChild(container);
+// document.body.appendChild(container);
 state.stateArray.push(makeGridCopy(row));
 
 
@@ -573,7 +573,10 @@ document.getElementById('exportButton').addEventListener('click', function() {
 
 
 document.getElementById('paintButton').addEventListener('click', function() {
-	brush.prototype.changeMode('paint');
+	brush.prototype.changeMode('erase');
+	document.getElementById('paintButton').classList.add('hidden');
+	document.getElementById('eraseButton').classList.remove('hidden');	
+	// brush.prototype.changeMode('paint');
 });
 
 document.getElementById('colorPickerButton').addEventListener('click', function() {
@@ -589,7 +592,10 @@ document.getElementById('lineButton').addEventListener('click', function() {
 });
 
 document.getElementById('eraseButton').addEventListener('click', function() {
-	brush.prototype.changeMode('erase');
+	brush.prototype.changeMode('paint');
+	document.getElementById('eraseButton').classList.add('hidden');
+	document.getElementById('paintButton').classList.remove('hidden');	
+	// brush.prototype.changeMode('erase');
 });
 
 document.getElementById('floodFillButton').addEventListener('click', function(){

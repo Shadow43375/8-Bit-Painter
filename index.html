@@ -2,6 +2,8 @@
 <html>
 <head>
 	<title></title>
+<!--     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous"> -->
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
 	<link rel="stylesheet" type="text/css" href="style.css">
 	<script src="jscolor.js"></script>
     <script type="text/javascript" src="bower_components/chroma-js/chroma.js"></script>
@@ -12,15 +14,33 @@
         <i id="overlayExitIcon">X</i>
       </div>
 
-	<div id='container'>
+    <div id="interfaceArea"> 
+		<div id='container'>
+		</div>
+		<div>
+		    <div id=""> </div>
+			<button class="brushControlButton" id='paintButton'><i class="fa fa-pencil-alt"></i></button>
+			<button class="brushControlButton hidden" id='eraseButton'><i class="fa fa-eraser"></i></button>
+			<button class="brushControlButton" id='colorPickerButton'><i class="fa fa-eye-dropper"></i></button>
+			<button class="brushControlButton" id='rectangleButton'><i class="fa fa-square"></i></button>
+			<button class="brushControlButton" id='lineButton'><i class="fa fa-arrows-alt-h"></i></button>
+			<button class="brushControlButton" id='floodFillButton'><i class="fa fa-fill-drip"></i></button>
+			<button class="brushControlButton" id='gridToggleButton'><i class="fa fa-chess-board"></i></button>
+			<button id='clearButton'>Clear</button>
+		    <button id='undoButton'><i class="fa fa-step-backward"></i></button>
+		    <button id='redoButton'><i class="fa fa-step-forward"></i></button>
+		</div>
+    </div>
 
-	</div>
 	
-	<button id='randomButton'>Randomize</button>
-	<button id='exportButton'>Export</button>
-	<button id='changeModeButton'>Change Mode</button>
+	<input id="colorMixingCheckBox" type="checkbox" name="colorMixing" value="NonMxing"> Enable Color Mixing
+	<button id='randomButton'><i class="fa fa-dice"></i></button>
+	<button id='exportButton'><i class="fa fa-file-download"></i></button>
 
-    <input class="jscolor {onFineChange:'update(this)'}" id='colorPicker'></button>
+
+
+    <input class="jscolor {onFineChange:'update(this)', valueElement:null,value:'536d59'}" id='colorPicker'></button>
+<!--     <input id='colorPicker'></button> -->
     <canvas id="myCanvas" style="display: none">
     Your browser does not support the HTML5 canvas tag.</canvas> 
 
