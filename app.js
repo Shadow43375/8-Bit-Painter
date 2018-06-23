@@ -584,22 +584,28 @@ document.getElementById('colorPickerButton').addEventListener('click', function(
 });
 
 document.getElementById('rectangleButton').addEventListener('click', function() {
-    brush.prototype.changeMode('rectangleTool');
+	brush.prototype.changeMode('lineTool');
+	document.getElementById('rectangleButton').classList.add('hidden');
+	document.getElementById('lineButton').classList.remove('hidden');	
 });
 
 document.getElementById('lineButton').addEventListener('click', function() {
-	brush.prototype.changeMode('lineTool');
+	brush.prototype.changeMode('floodFill');
+	document.getElementById('lineButton').classList.add('hidden');
+	document.getElementById('floodFillButton').classList.remove('hidden');	
 });
 
 document.getElementById('eraseButton').addEventListener('click', function() {
-	brush.prototype.changeMode('paint');
+    brush.prototype.changeMode('rectangleTool');
 	document.getElementById('eraseButton').classList.add('hidden');
-	document.getElementById('paintButton').classList.remove('hidden');	
+	document.getElementById('rectangleButton').classList.remove('hidden');	
 	// brush.prototype.changeMode('erase');
 });
 
 document.getElementById('floodFillButton').addEventListener('click', function(){
-	brush.prototype.changeMode('floodFill');
+	brush.prototype.changeMode('paint');
+	document.getElementById('floodFillButton').classList.add('hidden');
+	document.getElementById('paintButton').classList.remove('hidden');	
 });
 
 
