@@ -72,6 +72,11 @@ function downClickCell() {
 	   		floodFill(this.coordinates[0], this.coordinates[1], cellColorOnAlive, this.style.backgroundColor);
 	}
 
+	else if(mode === 'random') {
+		randomizeGrid(row, 0.50);
+	    addState();
+	}
+
 }
 
 
@@ -142,6 +147,10 @@ brush.prototype.changeMode = function(newMode) {
 	else if(newMode === "lineTool") {
 		mode = newMode;
 	    changeCursor("url('resources/pencil-cursor.png'), auto");
+	}
+	else if(newMode === "random") {
+		mode = newMode;
+		changeCursor("url('resources/pencil-cursor.png'), auto");
 	}
     else {
     	console.log("ERROR: " + newMode + "is not a valid brush mode");
@@ -506,11 +515,6 @@ for(let i=0; i<numberOfRows;i++) {
 state.stateArray.push(makeGridCopy(row));
 
 
-document.getElementById('randomButton').addEventListener('click', function(){
-	randomizeGrid(row, 0.50);
-    addState();
-});
-
 function randomizeGrid(matrix, percentEmpty) {
     let numberOfRows = matrix.length;
     let numberOfColumns = matrix[0].length
@@ -571,12 +575,22 @@ document.getElementById('exportButton').addEventListener('click', function() {
     	myFrame.classList.remove('hidden');
 });
 
+window.addEventListener("keydown", event => {
+    if (event.key.toLowerCase() == "z" && event.shiftKey && event.ctrlKey) {
+      redo();
+    }
+
+    else if(event.key.toLowerCase() == "z" && event.ctrlKey) {
+    	undo();
+    }
+
+  });
+
 
 document.getElementById('paintButton').addEventListener('click', function() {
 	brush.prototype.changeMode('erase');
 	document.getElementById('paintButton').classList.add('hidden');
 	document.getElementById('eraseButton').classList.remove('hidden');	
-	// brush.prototype.changeMode('paint');
 });
 
 document.getElementById('colorPickerButton').addEventListener('click', function() {
@@ -599,12 +613,17 @@ document.getElementById('eraseButton').addEventListener('click', function() {
     brush.prototype.changeMode('rectangleTool');
 	document.getElementById('eraseButton').classList.add('hidden');
 	document.getElementById('rectangleButton').classList.remove('hidden');	
-	// brush.prototype.changeMode('erase');
 });
 
 document.getElementById('floodFillButton').addEventListener('click', function(){
-	brush.prototype.changeMode('paint');
+	brush.prototype.changeMode('random');
 	document.getElementById('floodFillButton').classList.add('hidden');
+	document.getElementById('randomButton').classList.remove('hidden');	
+});
+
+document.getElementById('randomButton').addEventListener('click', function(){
+	brush.prototype.changeMode('paint');
+	document.getElementById('randomButton').classList.add('hidden');
 	document.getElementById('paintButton').classList.remove('hidden');	
 });
 
@@ -641,8 +660,8 @@ document.getElementById('clearButton').addEventListener('click', function() {
 		clearSates();	
 });
 
-document.getElementById('undoButton').addEventListener('click', function() {
-   if(state.stateArray[state.stateIndex - 1]) {
+function undo() {
+  if(state.stateArray[state.stateIndex - 1]) {
 	   state.stateIndex--;
 	   for(let i = 0; i<numberOfRows; i++) {
 	     for(let j = 0; j<numberOfColumns; j++) {
@@ -650,9 +669,11 @@ document.getElementById('undoButton').addEventListener('click', function() {
 	    }
 	  }
    }  
-});
+}
 
-document.getElementById('redoButton').addEventListener('click', function() {
+document.getElementById('undoButton').addEventListener('click', undo);
+
+function redo() {
    if(state.stateArray[state.stateIndex + 1]) {
 	   state.stateIndex++;
 	   for(let i = 0; i<numberOfRows; i++) {
@@ -661,7 +682,9 @@ document.getElementById('redoButton').addEventListener('click', function() {
 	    }
 	  }
    }   
-});
+}
+
+document.getElementById('redoButton').addEventListener('click', redo);
 
 
 document.getElementById('overlayExitIcon').addEventListener('click', function() {
