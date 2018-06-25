@@ -1,3 +1,5 @@
+var overlayActive = false;
+var previousButton = "paintButton";
 var dragRect = [];
 var dragLine = [];
 var coveredColumn = [];
@@ -126,6 +128,9 @@ brush.prototype.changeMode = function(newMode) {
 	if(newMode === "paint") {
 		mode = newMode;
 		changeCursor("url('resources/pencil-cursor.png'), auto");
+		document.getElementById(previousButton).classList.add('hidden');
+		document.getElementById('paintButton').classList.remove('hidden');
+		previousButton = "paintButton";
 	}
 	else if(newMode === "colorPick") {
 		mode = newMode;
@@ -135,22 +140,37 @@ brush.prototype.changeMode = function(newMode) {
 	else if(newMode === "erase") {
 		mode = newMode;
 		changeCursor("url('resources/eraser.png'), auto");
-	}
-	else if(newMode === "floodFill") {
-		mode = newMode;
-		changeCursor("url('resources/pencil-cursor.png'), auto");
+		document.getElementById(previousButton).classList.add('hidden');
+		document.getElementById('eraseButton').classList.remove('hidden');	
+		previousButton = "eraseButton";
 	}
 	else if(newMode === "rectangleTool") {
 		mode = newMode;
 	    changeCursor("url('resources/pencil-cursor.png'), auto");
+		document.getElementById(previousButton).classList.add('hidden');
+		document.getElementById('rectangleButton').classList.remove('hidden');
+        previousButton = "rectangleButton";
 	}
 	else if(newMode === "lineTool") {
 		mode = newMode;
 	    changeCursor("url('resources/pencil-cursor.png'), auto");
+		document.getElementById(previousButton).classList.add('hidden');
+		document.getElementById('lineButton').classList.remove('hidden');
+		previousButton = "lineButton";	
+	}
+	else if(newMode === "floodFill") {
+		mode = newMode;
+		changeCursor("url('resources/pencil-cursor.png'), auto");
+		document.getElementById(previousButton).classList.add('hidden');
+		document.getElementById('floodFillButton').classList.remove('hidden');
+		previousButton = "floodFillButton";	
 	}
 	else if(newMode === "random") {
 		mode = newMode;
 		changeCursor("url('resources/pencil-cursor.png'), auto");
+		document.getElementById(previousButton).classList.add('hidden');
+		document.getElementById('randomButton').classList.remove('hidden');	
+		previousButton = "randomButton";
 	}
     else {
     	console.log("ERROR: " + newMode + "is not a valid brush mode");
@@ -564,24 +584,87 @@ function randomizeGrid(matrix, percentEmpty) {
 }
 
 
-document.getElementById('exportButton').addEventListener('click', function() {
-     document.getElementById('overlay').classList.remove('hidden');
-   	    var myFrame = document.getElementById("myFrame");
-   	    let cellSize = Math.floor(exportSize/numberOfColumns);
-    	myFrame.height = exportSize;
-    	myFrame.width = exportSize;    
-    	myFrame.frameBorder= "0";
-    	myFrame.src = PNGFromGrid(row, cellSize);
-    	myFrame.classList.remove('hidden');
-});
+function overlayToggle(keyPressed) {
+	console.log("on entry to overlayToggle: ");
+	console.log(overlayActive);
+	if(!overlayActive && keyPressed !== 'Escape') {
+	        overlayActive = true;
+	    	document.getElementById('overlay').classList.remove('hidden');
+	   	    var myFrame = document.getElementById("myFrame");
+	   	    let cellSize = Math.floor(exportSize/numberOfColumns);
+	    	myFrame.height = exportSize;
+	    	myFrame.width = exportSize;    
+	    	myFrame.frameBorder= "0";
+	    	myFrame.src = PNGFromGrid(row, cellSize);
+	    	myFrame.classList.remove('hidden');	
+	}
+	else if(overlayActive) {
+    	overlayActive = false;
+		document.getElementById('overlay').classList.add('hidden');
+		document.getElementById('myFrame').classList.add('hidden');
+	}
+}
+
+document.getElementById('exportButton').addEventListener('click', overlayToggle);
 
 window.addEventListener("keydown", event => {
+    console.log(event.key);
+
     if (event.key.toLowerCase() == "z" && event.shiftKey && event.ctrlKey) {
-      redo();
+        redo();
     }
 
     else if(event.key.toLowerCase() == "z" && event.ctrlKey) {
-    	undo();
+        undo();
+    }
+
+    else if(event.key.toLowerCase() == "e") {
+ 		brush.prototype.changeMode('erase');   	
+    }
+
+    else if(event.key.toLowerCase() == "p") {
+ 		brush.prototype.changeMode('paint');   	
+    }
+
+    else if(event.key.toLowerCase() == "l") {
+ 		brush.prototype.changeMode('lineTool');   	
+    }
+
+
+    else if(event.key.toLowerCase() == "r") {
+ 		brush.prototype.changeMode('rectangleTool');   	
+    }
+
+     else if(event.key.toLowerCase() == "f") {
+ 		brush.prototype.changeMode('floodFill');   	
+    }
+
+    else if(event.key.toLowerCase() == "s") {
+ 		brush.prototype.changeMode('colorPick');   	
+    }
+
+    else if(event.key.toLowerCase() == "d") {
+ 		brush.prototype.changeMode('random');   	
+    }
+
+    else if(event.key.toLowerCase() == "g") {
+ 		gridToggle();   	
+    }
+
+    else if(event.key == 'Delete') {
+    	clearGrid();
+    }
+
+    else if(event.key.toLowerCase() == "m") {
+    	mixToggle();
+    }
+
+    else if(event.key.toLowerCase() == "i" && event.ctrlKey) {
+    	overlayToggle();
+    }
+
+    else if(event.key == 'Escape') {
+    	overlayToggle(event.key);
     }
 
   });
@@ -589,55 +672,49 @@ window.addEventListener("keydown", event => {
 
 document.getElementById('paintButton').addEventListener('click', function() {
 	brush.prototype.changeMode('erase');
-	document.getElementById('paintButton').classList.add('hidden');
-	document.getElementById('eraseButton').classList.remove('hidden');	
+});
+
+document.getElementById('eraseButton').addEventListener('click', function() {
+    brush.prototype.changeMode('rectangleTool');	
+});
+
+
+document.getElementById('rectangleButton').addEventListener('click', function() {
+	brush.prototype.changeMode('lineTool');
+});
+
+document.getElementById('lineButton').addEventListener('click', function() {
+	brush.prototype.changeMode('floodFill');
+});
+
+document.getElementById('floodFillButton').addEventListener('click', function(){
+	brush.prototype.changeMode('random');
+});
+
+document.getElementById('randomButton').addEventListener('click', function(){
+	brush.prototype.changeMode('paint');	
 });
 
 document.getElementById('colorPickerButton').addEventListener('click', function() {
 	brush.prototype.changeMode('colorPick');
 });
 
-document.getElementById('rectangleButton').addEventListener('click', function() {
-	brush.prototype.changeMode('lineTool');
-	document.getElementById('rectangleButton').classList.add('hidden');
-	document.getElementById('lineButton').classList.remove('hidden');	
-});
-
-document.getElementById('lineButton').addEventListener('click', function() {
-	brush.prototype.changeMode('floodFill');
-	document.getElementById('lineButton').classList.add('hidden');
-	document.getElementById('floodFillButton').classList.remove('hidden');	
-});
-
-document.getElementById('eraseButton').addEventListener('click', function() {
-    brush.prototype.changeMode('rectangleTool');
-	document.getElementById('eraseButton').classList.add('hidden');
-	document.getElementById('rectangleButton').classList.remove('hidden');	
-});
-
-document.getElementById('floodFillButton').addEventListener('click', function(){
-	brush.prototype.changeMode('random');
-	document.getElementById('floodFillButton').classList.add('hidden');
-	document.getElementById('randomButton').classList.remove('hidden');	
-});
-
-document.getElementById('randomButton').addEventListener('click', function(){
-	brush.prototype.changeMode('paint');
-	document.getElementById('randomButton').classList.add('hidden');
-	document.getElementById('paintButton').classList.remove('hidden');	
-});
-
-
 document.getElementById('colorMixingCheckBox').addEventListener( 'change', function() {
-    if(this.checked) {
-    	mixing = true;
-    } else {
-    	mixing = false;
-    }
+	mixToggle();
 });
 
+function mixToggle() {
+    if(!mixing) {
+    	document.getElementById('colorMixingCheckBox').checked = true;
+    	mixing = true;
+    } else if(mixing) {
+		document.getElementById('colorMixingCheckBox').checked = false;
+    	mixing = false;
+    }	
+}
 
-document.getElementById('gridToggleButton').addEventListener('click', function() {
+
+function gridToggle() {
    		for(let i = 0; i< numberOfRows; i++) {
 			for(let j = 0; j < numberOfColumns; j++) {
 				if(row[i][j].style.border === gridColor) {
@@ -648,17 +725,20 @@ document.getElementById('gridToggleButton').addEventListener('click', function()
 				}
 			}
 		}
-});
+}
 
+document.getElementById('gridToggleButton').addEventListener('click', gridToggle);
 
-document.getElementById('clearButton').addEventListener('click', function() {
+function clearGrid() {
    		for(let i = 0; i< numberOfRows; i++) {
 			for(let j = 0; j < numberOfColumns; j++) {
 				row[i][j].style.backgroundColor = "white";
 			}
 		}
-		clearSates();	
-});
+		clearSates();		
+}
+
+document.getElementById('clearButton').addEventListener('click', clearGrid);
 
 function undo() {
   if(state.stateArray[state.stateIndex - 1]) {
@@ -687,10 +767,7 @@ function redo() {
 document.getElementById('redoButton').addEventListener('click', redo);
 
 
-document.getElementById('overlayExitIcon').addEventListener('click', function() {
-	document.getElementById('overlay').classList.add('hidden');
-	document.getElementById('myFrame').classList.add('hidden');
-});
+document.getElementById('overlayExitIcon').addEventListener('click', overlayToggle);
 
 
 
